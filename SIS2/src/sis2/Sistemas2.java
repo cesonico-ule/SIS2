@@ -5,7 +5,11 @@
  */
 package sis2;
 
-import javax.transaction.Transaction;
+//import javax.transaction.Transaction;
+
+import java.util.List;
+import javax.management.Query;
+
 import net.sf.ehcache.hibernate.HibernateUtil;
 import org.hibernate.Query;
 import org.hibernate.Session;
