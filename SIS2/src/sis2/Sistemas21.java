@@ -129,14 +129,30 @@ public class Sistemas2 {
                 }
             }
             */
+            if (emp != null){
+                //actualizaEmpresaExcepto(emp);
+                consultaHQL = "FROM Empresas e WHERE e.idEmpresa != :param1"; //t es alias obligatorio
+
+                query = sesion.createQuery(consultaHQL);
+                query.setParameter("param1", emp.getIdEmpresa());
+                
+                List<Empresas> listaResulEmp = query.list();
+                for(Empresas ebd: listaResulEmp){
+                            System.out.println(ebd.getNombre());
+                    ebd.setNombre(ebd.getNombre()+"_2021");
+                    tr = sesion.beginTransaction();
+                    sesion.save(ebd);
+                    tr.commit();
+                }
+            }
             sesion.close();
             HibernateUtil.shutdown();
         }
         catch(Exception e){
             sesion.close();
             HibernateUtil.shutdown();
-            System.err.println("No está el horno para bollos " + e.getMessage());
+            System.err.println("No está el horno para bollos\n" + e.getMessage());
         }
-        if (emp != null) actualizaEmpresaExcepto(emp);
+        
     }
 }
