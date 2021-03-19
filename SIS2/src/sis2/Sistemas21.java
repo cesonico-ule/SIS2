@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package sistemas2;
 
 import Modelo.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -16,19 +10,18 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**
- *
- * @author Santiago Ares Alfayate
+ * @author Ares Alfayate Santiago
+ * @author Bermejo Fernandez Cesar
  */
 public class Sistemas2 {
 
     public static void main(String[] args) {
-        //consultaDNI(peticionDatos());
-        consultaDNI("09741138V");
+        consultaDNI(peticionDatos());
+        //consultaDNI("09741138V");
         
     }
     
     public static String peticionDatos(){
-        
         Scanner sc = new Scanner(System.in);
         
         //pedir dni del empleado
@@ -36,39 +29,6 @@ public class Sistemas2 {
         return sc.nextLine();
     }
     
-    public static void actualizaEmpresaExcepto(Empresas empresaExcepcion){
-        SessionFactory sf = null;
-        Session sesion = null;
-        Transaction tr = null; //No se usa
-        
-        try{
-                            System.out.println("PRUebas 1");
-            sf = HibernateUtil.getSessionFactory();
-                            System.out.println("PRUebas 3");
-
-            sesion = sf.openSession(); //no abre una nueva sesion
-
-                            System.out.println("PRUebas 684");
-            String consultaHQL = "FROM Empresas e WHERE e.idEmpresa != :param1"; //t es alias obligatorio
-                            System.out.println("PRUebas 321");
-            Query query = sesion.createQuery(consultaHQL);
-            query.setParameter("param1", empresaExcepcion.getIdEmpresa());
-                            System.out.println("PRUebas 987");
-                            
-            List<Empresas> listaResultado = query.list();
-            /*
-            for(Empresas ebd: listaResultado){
-                            System.out.println("PRUebas 34");
-                ebd.setNombre(ebd.getNombre()+"2021");
-            }
-            */
-            HibernateUtil.shutdown();
-        }
-        catch(Exception e){
-            HibernateUtil.shutdown();
-            System.err.println("No está el horno para bollos " + e.getMessage());
-        }
-    }
     public static void consultaDNI (String dni){
         SessionFactory sf = null;
         Session sesion = null;
@@ -86,6 +46,8 @@ public class Sistemas2 {
             query.setParameter("param1", dni);
             
             List<Trabajadorbbdd> listaResultado = query.list();
+            
+            //Tarea 1
             if (listaResultado.isEmpty()){
                 System.out.println("\nNo conocemos a nadie con esos datos");
             }
@@ -95,7 +57,6 @@ public class Sistemas2 {
                 System.out.println("Nombre:\t\t" + ttbd.getNombre());
                 System.out.println("Apellidos:\t"+ ttbd.getApellido1()+"\t"+ttbd.getApellido2());
                 System.out.println("NIF:\t\t" + ttbd.getNifnie());
-                //System.out.println("Fecha incorporacion:\t"+ tbd.getFechaAlta());
                 System.out.println("Categoria:\t"+ ttbd.getCategorias().getNombreCategoria());
                 System.out.println("Empresa:\t"+ ttbd.getEmpresas().getNombre());
                 
@@ -108,30 +69,11 @@ public class Sistemas2 {
                 System.out.println("*******************************");
                 emp = ttbd.getEmpresas();
             }
-            /*    for(Trabajadorbbdd tbd: listaResultado){
-                    System.out.println("Nombre:\t\t" + tbd.getNombre());
-                    System.out.println("Apellidos:\t"+ tbd.getApellido1()+"\t"+tbd.getApellido2());
-                    System.out.println("NIF:\t\t" + tbd.getNifnie());
-                    //System.out.println("Fecha incorporacion:\t"+ tbd.getFechaAlta());
-                    System.out.println("Categoria:\t"+ tbd.getCategorias().getNombreCategoria());                    
-                    System.out.println("Empresa:\t"+ tbd.getEmpresas().getNombre()); 
-                    Set<Nomina> listaNominas =  tbd.getNominas();
-                    for(Nomina a: listaNominas ){
-                        System.out.println("Año:\t"+ a.getAnio()+"\tMes:\t"+a.getMes());
-                        System.out.printf("Bruto:\t"+a.getBrutoNomina()+" €\n");
-                    }
-                    System.out.println("*******************************");
-                    
-                    
-                    //Tarea 2
-                    empresasNO.add(tbd.getEmpresas().getIdEmpresa());
-                    
-                }
-            }
-            */
+            
+            //Tarea 2
             if (emp != null){
-                //actualizaEmpresaExcepto(emp);
-                consultaHQL = "FROM Empresas e WHERE e.idEmpresa != :param1"; //t es alias obligatorio
+                
+                consultaHQL = "FROM Empresas e WHERE e.idEmpresa != :param1"; 
 
                 query = sesion.createQuery(consultaHQL);
                 query.setParameter("param1", emp.getIdEmpresa());
@@ -142,6 +84,26 @@ public class Sistemas2 {
                     ebd.setNombre(ebd.getNombre()+"_2021");
                     tr = sesion.beginTransaction();
                     sesion.save(ebd);
+                    tr.commit();
+                }
+                
+                //Tarea 3
+                for (Empresas ebd : listaResulEmp) {
+                    Set<Trabajadorbbdd> ts = ebd.getTrabajadorbbdds();
+                    
+                    for (Trabajadorbbdd tb : ts) {
+                        System.out.println("Borrando nominas del trabajador: "+tb.getIdTrabajador()+" de la empresa: "+ebd.getIdEmpresa());
+                        
+                        tr = sesion.beginTransaction();
+                        String HQLborrado = "DELETE Nomina n WHERE n.trabajadorbbdd.idTrabajador=:param3";
+                        sesion.createQuery(HQLborrado).setParameter("param3", tb.getIdTrabajador()).executeUpdate();
+                        tr.commit();
+                    }
+                    System.out.println("Borrando trabajadores de la empresa: "+ebd.getIdEmpresa());
+
+                    tr = sesion.beginTransaction();
+                    String HQLborrado = "DELETE Trabajadorbbdd t WHERE t.empresas.idEmpresa=:param4";
+                    sesion.createQuery(HQLborrado).setParameter("param4", ebd.getIdEmpresa()).executeUpdate();
                     tr.commit();
                 }
             }
