@@ -9,6 +9,17 @@ public class Herramientas {
     /*
         Descaregar JDom(xml) y ApachePoi(excel)
     */
+    
+    public static void main (String [] Args){
+        String s = "99558741226555551120";
+        System.out.println(generaIBAN(s, "HU"));
+        
+        /*
+        System.out.println(generaEMAIL ("Cesar", "Bermejo", "", "Securitas"));
+        calculoCCC(s);
+        */
+    }
+    
     public static char calculoNIE(String num){
         char[] base = {'T','R','W','A','G','M','Y','F','P','D','X','B','N','J',
             'Z','S','Q','V','H','L','C','K','E'};
@@ -33,7 +44,7 @@ public class Herramientas {
         return base[numero];
     }
     
-    public static void calculoCCC(String numCuenta){
+    public static String calculoCCC(String numCuenta){
         
         //---Carga de substrings---
         String primer = "00".concat(numCuenta.substring(0, 8));
@@ -46,33 +57,83 @@ public class Herramientas {
         int checkSegun = check.charAt(1) - '0';
         
         //---Comprobación usando el metodo bucle---
-        int resultPrimer = bucle(primer);
-        int resultSegun = bucle(segun);
+        int resultPrimer = bucleNum(primer);
+        int resultSegun = bucleNum(segun);
         
         if(resultPrimer != checkPrimer || resultSegun != checkSegun){
-            System.out.println("El IBAN NO es correcto. Se procede a corregirlo.\n");
+            System.out.println("El codigo de cuenta NO es correcto. Se procede a corregirlo.\n");
             //---Primeros 8 digitos---
-            String nuevoIban = numCuenta.substring(0, 8);
+            String nuevoCodigo = numCuenta.substring(0, 8);
             
             //---Transformacion en String de los digitos de comprobacion---
-            nuevoIban = nuevoIban.concat(String.valueOf(resultPrimer));
+            nuevoCodigo = nuevoCodigo.concat(String.valueOf(resultPrimer));
             
-            nuevoIban = nuevoIban.concat(String.valueOf(resultSegun));
+            nuevoCodigo = nuevoCodigo.concat(String.valueOf(resultSegun));
             
             //---Ultimos 10 digitos---
-            nuevoIban = nuevoIban.concat(numCuenta.substring(10, 20));
+            nuevoCodigo = nuevoCodigo.concat(numCuenta.substring(10, 20));
             
             //---Llamar al metodo de corregir con el nuevoIban---
-            corrige(nuevoIban);
-            
+            corrigeNum(nuevoCodigo);
+            return nuevoCodigo;
         } else {
-            System.out.println("El IBAN es correcto.\n");
+            System.out.println("El codigo de cuenta es correcto.\n");
+            return numCuenta;
         }
+    }
+ 
+    
+    public static String generaIBAN (String numCuenta, String pais){
+        String IBANcalc = "";
+        IBANcalc += numCuenta;
+        
+        //Al final se incluyen las letras del pais con su valor en char sumado a 10 para que la A valga 10
+        IBANcalc += (pais.charAt(0)-'A'+10) + (pais.charAt(1)-'A'+10) + "00";
+        Double IBANd = Double.parseDouble(IBANcalc);
+        
+        //Sacamos el resto de dividir por 97 y obtenemos la diferencia entre ese y 98
+        double resto = IBANd%97;
+        resto = 98-resto;
+        String checkNums;
+        if(resto<10){
+            checkNums = "0" + Double.toString(resto);
 
+        } else {
+            checkNums = Double.toString(resto);
+        }
+        
+        //Ahora juntamos los valores
+        String IBAN = pais + checkNums + numCuenta; 
+        
+        return IBAN;
     }
     
+    public static String generaEMAIL (String nombre, String apellido1, String apellido2, String empresa){
+        //Crea variable
+        String email = "";
+        
+        //Primera letra del nombre
+        email += nombre.charAt(0);
+        
+        //Primera letra del appellido
+        email += apellido1.charAt(0);
+        
+        //Primera letra del segundo appellido (si este existe)
+        if(!apellido2.equals(""))email += apellido2.charAt(0);
+        
+        // +++++++++++++++++ POR IMPLEMENTAR +++++++++++++++++++++++++++++++++++++++++++++++++++++
+        //Cifra de repetición
+        email += "00";
+        
+        //Nombre de la empresa como dominio
+        email += ("@" + empresa + ".com");
+
+        return email;
+    }
     
-    public static int bucle(String aux){
+    //------------ AUXILIAR -----------
+    
+    public static int bucleNum(String aux){
         int numero=0;
         int[] F ={1,2,4,8,5,10,9,7,3,6};
         
@@ -103,17 +164,8 @@ public class Herramientas {
     }
     
     // +++++++++++++++++ POR IMPLEMENTAR ++++++++++++++++++++++
-    public static void corrige (String iban){
+    public static void corrigeNum (String numCuenta){
         
     }
-    
-    public static void main (String [] Args){
-        String s = new String();
-        s = "99558741226555551120";
-        calculoCCC(s);
-        
-    }
-    
-
     
 }
