@@ -1,10 +1,12 @@
-package sis2;
+package sistemas2;
 
 import Modelo.*;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import javax.management.Query;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -17,6 +19,7 @@ public class Sistemas2 {
     
     static String archivo = "resources\\SistemasInformacionII.xlsx";
     static ManejadorExcel manejador = new ManejadorExcel();
+    static ArrayList<String[]> datosTrabajadores = null;
     
     public static void main(String[] args) {
         /*
@@ -24,6 +27,13 @@ public class Sistemas2 {
             consultaDNI(peticionDatos());
             consultaDNI("09741138V");
         */
+        try{
+            datosTrabajadores = manejador.lecturaHoja(archivo, 3);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+	}
+        
         boolean salir = false;
         Scanner sc = new Scanner(System.in);
         
@@ -34,7 +44,7 @@ public class Sistemas2 {
                     "2. Comprobar y generar las cuentas bancarias\n"+
                     "3. Generar los emails\n"+
                     "4. Tarea completa\n"+
-                    "0. Salir\n");
+                    "\n0. Salir\n");
             
             switch(sc.next()){
                 case "0":
@@ -68,7 +78,9 @@ public class Sistemas2 {
     }
     
     public static void compruebaDNIs(){
-        
+        for (String[] str : datosTrabajadores) {
+            
+        }
     }
     
     public static void compruebaIBANs(){
@@ -76,10 +88,6 @@ public class Sistemas2 {
     }
     
     public static void creaEMAILs(){
-        
-    }
-    
-    public static void test(){
         
     }
     

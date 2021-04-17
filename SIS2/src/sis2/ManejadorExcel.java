@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -33,32 +32,48 @@ public class ManejadorExcel {
         //estoy en la hoja que he querido leer
         //leo todas las filas
         
-        for (Row r : sheet){
-            for (Cell c: r){
-                
-                if(c.getRowIndex()!=0){ //no queremos los titulos de las tablas
-                    if (c.getColumnIndex()==3){ //esto tiene formato fecha
-                        valoresFilas[c.getColumnIndex()]=c.getDateCellValue().toString();
-                        System.out.println(c.getDateCellValue());
+        for (Row fila : sheet){
+            if(!isRowEmpty(fila)){
+                for (Cell celda: fila){
+
+
+                    if(celda.getRowIndex()!=0){ //no queremos los titulos de las tablas
+                        if (celda.getColumnIndex()==3){ //esto tiene formato fecha
+                            valoresFilas[celda.getColumnIndex()]=celda.getDateCellValue().toString();
+                            System.out.println(celda.getDateCellValue());
+                        }
+
+                        else{
+                            valoresFilas[celda.getColumnIndex()]=celda.getStringCellValue();
+                            System.out.println(celda.getStringCellValue());
+                        }
                     }
-    /*                else if (c.getColumnIndex() == 9){//campo unicamente numerico - error si tratamos de leer un string
-                        
-                    }*/
-                    else{
-                        valoresFilas[c.getColumnIndex()]=c.getStringCellValue();
-                        System.out.println(c.getStringCellValue());
+                }
+                if (fila.getRowNum() != 0) {
+                    valoresCeldas.add(valoresFilas.clone());
+                    for (int k = 0; k < valoresFilas.length; k++) {
+                        valoresFilas[k] = null;
                     }
-		}
-            }
-            if (r.getRowNum() != 0) {
-                valoresCeldas.add(valoresFilas.clone());
-                for (int k = 0; k < valoresFilas.length; k++) {
-                    valoresFilas[k] = null;
                 }
             }
         }
         workbook.close();
         return valoresCeldas;
     }
+    
+    private static boolean isRowEmpty(Row row) {
+	boolean isEmpty = true;
+        DataFormatter dataFormatter = new DataFormatter();
 
+        if (row != null) {
+            for (Cell cell : row) {
+                if (dataFormatter.formatCellValue(cell).trim().length() > 0) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+        }
+
+        return isEmpty;
+    }
 }
