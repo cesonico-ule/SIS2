@@ -1,10 +1,10 @@
-package sistemas2;
+package sis2;
 
 import Modelo.*;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import org.hibernate.Query;
+import javax.management.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -33,17 +33,50 @@ public class Sistemas2 {
                     "1. Comprobar los DNIs\n"+
                     "2. Comprobar y generar las cuentas bancarias\n"+
                     "3. Generar los emails\n"+
+                    "4. Tarea completa\n"+
                     "0. Salir\n");
             
             switch(sc.next()){
                 case "0":
+                    System.out.println("Saliendo del programa...");
                     salir = true;
                     break;
-                case "1":
-                    System.out.println("Comenzando la comprobación de los DNIs");
                     
+                case "1":
+                    System.out.println("Comenzando la comprobación de los DNIs...");
+                    compruebaDNIs();
+                break;
+                
+                case "2":
+                    System.out.println("Comprobando los datos de IBAN de las cuentas bancarias...");
+                    compruebaIBANs();
+                break;
+                
+                case "3":
+                    System.out.println("Generando los emails de empresa de los trabajadores...");
+                    creaEMAILs();
+                break;
+                
+                case "4":
+                    System.out.println("Realizando todas las tareas...");
+                    compruebaDNIs();
+                    compruebaIBANs();
+                    creaEMAILs();
+                break;
             }
         }
+    }
+    
+    public static void compruebaDNIs(){
+        
+    }
+    
+    public static void compruebaIBANs(){
+        
+    }
+    
+    public static void creaEMAILs(){
+        
     }
     
     public static void test(){
