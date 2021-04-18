@@ -31,57 +31,47 @@ public class Errores {
             DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
             Document document = documentBuilder.newDocument();
  
-            // root element
-            Element root = document.createElement("company");
+            // Elemento root
+            Element root = document.createElement("Empresa");
             document.appendChild(root);
  
-            // employee element
-            Element employee = document.createElement("employee");
+            // Elemento empleado
+            Element empleado = document.createElement("Empleado");
  
-            root.appendChild(employee);
+            root.appendChild(empleado);
  
             // set an attribute to staff element
             Attr attr = document.createAttribute("id");
             attr.setValue("10");
-            employee.setAttributeNode(attr);
+            empleado.setAttributeNode(attr);
  
             //you can also use staff.setAttribute("id", "1") for this
  
-            // firstname element
-            Element firstName = document.createElement("firstname");
-            firstName.appendChild(document.createTextNode("James"));
-            employee.appendChild(firstName);
+            // Elemento Nombre
+            Element firstName = document.createElement("Nombre");
+            firstName.appendChild(document.createTextNode("Julio"));
+            empleado.appendChild(firstName);
  
-            // lastname element
-            Element lastname = document.createElement("lastname");
-            lastname.appendChild(document.createTextNode("Harley"));
-            employee.appendChild(lastname);
+            // Elemento apellido
+            Element lastname = document.createElement("Apellido");
+            lastname.appendChild(document.createTextNode("Gutierrez"));
+            empleado.appendChild(lastname);
  
-            // email element
+            // Elemento email
             Element email = document.createElement("email");
-            email.appendChild(document.createTextNode("james@example.org"));
-            employee.appendChild(email);
+            email.appendChild(document.createTextNode("JG00@Recursos.com"));
+            empleado.appendChild(email);
  
-            // department elements
-            Element department = document.createElement("department");
-            department.appendChild(document.createTextNode("Human Resources"));
-            employee.appendChild(department);
- 
-            // create the xml file
-            //transform the DOM Object to an XML File
+            // Crea el XML
+            // Transforma el objeto DOM en el archivo xml
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
-            DOMSource domSource = new DOMSource(document);
             StreamResult streamResult = new StreamResult(new File(xmlFilePath));
+            DOMSource dom = new DOMSource(document);
+            
+            transformer.transform(dom, streamResult);
  
-            // If you use
-            // StreamResult result = new StreamResult(System.out);
-            // the output will be pushed to the standard output ...
-            // You can use that for debugging 
- 
-            transformer.transform(domSource, streamResult);
- 
-            System.out.println("Done creating XML File");
+            System.out.println("Creado el archivo XML");
  
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
