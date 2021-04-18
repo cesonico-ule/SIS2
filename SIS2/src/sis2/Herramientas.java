@@ -6,9 +6,6 @@ package sis2;
  * @author Bermejo Fernandez Cesar
  */
 public class Herramientas {
-    /*
-     *Le envias el DNI bien formateado y te devuelve la letra que le corresponde
-    */
     
     public static void main (String [] Args){
         String s = "11112223504444444444";
@@ -20,6 +17,10 @@ public class Herramientas {
         */
     }
     
+    
+    // ||---------------------------- EJERCICIOS --------------------------|| 
+    
+    //*Le envias el DNI bien formateado y te devuelve la letra que le corresponde*
     public static char calculoNIE(String num){
         char[] base = {'T','R','W','A','G','M','Y','F','P','D','X','B','N','J',
             'Z','S','Q','V','H','L','C','K','E'};
@@ -44,6 +45,7 @@ public class Herramientas {
         return base[numero];
     }
     
+    //*Calcula el codigo de seguridad y lo corrige en caso de que no coincida con el existente*
     public static String calculoCCC(String numCuenta){
         
         //---Carga de substrings---
@@ -53,7 +55,6 @@ public class Herramientas {
         //System.out.println(check + " esto es el check antiguo");
         
         int checkPrimer = check.charAt(0) - '0';
-        
         int checkSegun = check.charAt(1) - '0';
         
         //---Comprobación usando el metodo bucle---
@@ -81,27 +82,16 @@ public class Herramientas {
             return numCuenta;
         }
     }
-    
-    private static int calculateModulus97(String iban) {
-        long total = 0;
-        for (int i = 0; i < iban.length(); i++) {
-            int charValue = Character.getNumericValue(iban.charAt(i));
-            total = (charValue > 9 ? total * 100 : total * 10) + charValue;
-            if (String.valueOf(total).length() > 9) {
-                total = (total % 97);
-            }
-        }
-        return (int)(total % 97);
-    }
-    
+
+    //*Genera el codigo IBAN dado el numero de cuenta previamente calculado y el pais de la cuenta*
     public static String generaIBAN (String numCuenta, String pais){
         String IBANcalc = "";
         IBANcalc += numCuenta;
         
-        //Al final se incluyen las letras del pais con su valor en char sumado a 10 para que la A valga 10
+        //---Al final se incluyen las letras del pais con su valor en char sumado a 10 para que la A valga 10---
         IBANcalc += (pais.charAt(0)-'A'+10) + (pais.charAt(1)-'A'+10) + "00";
         
-        //Sacamos el resto de dividir por 97 y obtenemos la diferencia entre ese y 98
+        //---Sacamos el resto de dividir por 97 y obtenemos la diferencia entre ese y 98---
         double resto = calculateModulus97(IBANcalc);
         resto = 98-resto;
         
@@ -121,37 +111,38 @@ public class Herramientas {
             checkNums = Integer.toString((int)resto);
         }
         
-        //Ahora juntamos los valores
+        //---Ahora juntamos los valores---
         String IBAN = pais + checkNums + numCuenta; 
         
         return IBAN;
     }
     
+    //*Genera un email automatico con los datos del usuario*
     public static String generaEMAIL (String nombre, String apellido1, String apellido2, String empresa){
-        //Crea variable
+        //---Crea variable---
         String email = "";
         
-        //Primera letra del nombre
+        //---Primera letra del nombre---
         email += nombre.charAt(0);
         
-        //Primera letra del appellido
+        //---Primera letra del appellido---
         email += apellido1.charAt(0);
         
-        //Primera letra del segundo appellido (si este existe)
+        //---Primera letra del segundo appellido (si este existe)---
         if(!apellido2.equals(""))email += apellido2.charAt(0);
         
-        // +++++++++++++++++ POR IMPLEMENTAR +++++++++++++++++++++++++++++++++++++++++++++++++++++
-        //Cifra de repetición
-        email += "00";
+        //---Cifra de repetición---
+        email += compruebaReps(email);
         
-        //Nombre de la empresa como dominio
+        //---Nombre de la empresa como dominio---
         email += ("@" + empresa + ".com");
 
         return email;
     }
     
-    //------------ AUXILIAR -----------
+    // ||---------------------------- AUXILIAR --------------------------||
     
+    //*Calcula el sumatorio de multiplicaciones que comprueba el numero de cuenta*
     public static int bucleNum(String aux){
         int numero=0;
         int[] F ={1,2,4,8,5,10,9,7,3,6};
@@ -182,9 +173,32 @@ public class Herramientas {
         return numero;
     }
     
-    // +++++++++++++++++ POR IMPLEMENTAR ++++++++++++++++++++++
+    // +++++++++++++++++ POR IMPLEMENTAR ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //*Llama al acceso al archivo de excel y corrige un codigo de cuenta bancaria incorrecto*
     public static void corrigeNum (String numCuenta){
         
+    }
+        
+    //*Calcula el modulo del IBAN entre 97 de manera mecanica*
+    private static int calculateModulus97(String iban) {
+        long total = 0;
+        for (int i = 0; i < iban.length(); i++) {
+            int charValue = Character.getNumericValue(iban.charAt(i));
+            total = (charValue > 9 ? total * 100 : total * 10) + charValue;
+            if (String.valueOf(total).length() > 9) {
+                total = (total % 97);
+            }
+        }
+        return (int)(total % 97);
+    }
+    
+    // +++++++++++++++++ POR IMPLEMENTAR ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //*Comprueba el numero de personas con mismo correo hasta ahora y devuelve un String de dos cifras indicando dicho numero*
+    public static String compruebaReps (String email){
+        
+        
+        
+        return null;
     }
     
 }
