@@ -7,7 +7,7 @@ package sis2;
  */
 public class Herramientas {
     /*
-        Descaregar JDom(xml) y ApachePoi(excel)
+     *Le envias el DNI bien formateado y te devuelve la letra que le corresponde
     */
     
     public static void main (String [] Args){
