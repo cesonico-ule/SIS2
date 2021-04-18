@@ -1,4 +1,4 @@
-package sis2;
+package sistemas2;
 
 /**
  *
@@ -21,12 +21,11 @@ import org.w3c.dom.Element;
  
 public class Errores {
  
-    public static final String xmlFilePath = "resources\\Errores.xml";
- 
-    public static void main(String argv[]) {
- 
+    public static void generaErrorDNI(String[] persona){
+        String xmlFilePath = "resources\\ErroresDNI.xml";
         try {
- 
+            //ejemplo de xml
+            
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
             Document document = documentBuilder.newDocument();
@@ -78,5 +77,9 @@ public class Errores {
         } catch (TransformerException tfe) {
             tfe.printStackTrace();
         }
+    }
+   
+    public static void generaErrorCCC(){
+        
     }
 }
