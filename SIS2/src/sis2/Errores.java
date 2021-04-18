@@ -40,12 +40,12 @@ public class Errores {
  
             root.appendChild(empleado);
  
-            // set an attribute to staff element
+            // Le da un id
             Attr attr = document.createAttribute("id");
             attr.setValue("10");
             empleado.setAttributeNode(attr);
  
-            //you can also use staff.setAttribute("id", "1") for this
+            //staff.setAttribute("id", "1")
  
             // Elemento Nombre
             Element firstName = document.createElement("Nombre");
