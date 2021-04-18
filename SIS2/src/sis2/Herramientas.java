@@ -115,10 +115,10 @@ public class Herramientas {
                 
         String checkNums;
         if(resto<10){
-            checkNums = "0" + Double.toString(resto);
+            checkNums = "0" + Integer.toString((int)resto);
 
         } else {
-            checkNums = Double.toString(resto);
+            checkNums = Integer.toString((int)resto);
         }
         
         //Ahora juntamos los valores
