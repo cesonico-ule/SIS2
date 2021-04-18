@@ -3,6 +3,7 @@ package sistemas2;
 import Modelo.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -88,7 +89,28 @@ public class Sistemas2 {
     }
     
     public static void creaEMAILs(){
-        
+        HashMap <String, Integer> lista = new HashMap<>();
+        String correo;
+        for (String[] str : datosTrabajadores) {
+                                                //System.out.println("Paso 1");
+            if (str[5] == null){//no tiene 2º apellido
+                correo = ""+str[6].charAt(0)+str[4].charAt(0);
+                                                //System.out.println("Paso 2");
+            }else //tiene 2º apellido
+                correo = "" + str[6].charAt(0) + str[4].charAt(0) + str[5].charAt(0);
+                                                //System.out.println("Paso 3");
+
+            if (lista.get(correo) == null){ //no hay ninguno mas
+                lista.put(correo, 1);
+                correo += "00@";
+                
+            }else {//ya hay alguno con ese nombre
+                lista.put(correo, lista.get(correo)+1);
+                correo += String.format("%02d", lista.get(correo)) + "@";
+            }
+            correo+= str[0] + ".com";
+            System.out.println(correo);
+        }
     }
     
     public static String peticionDatos(){
