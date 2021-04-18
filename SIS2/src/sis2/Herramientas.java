@@ -11,8 +11,8 @@ public class Herramientas {
     */
     
     public static void main (String [] Args){
-        String s = "99558741226555551120";
-        System.out.println(generaIBAN(s, "HU"));
+        String s = "11112223504444444444";
+        System.out.println(generaIBAN(s, "ES"));
         
         /*
         System.out.println(generaEMAIL ("Cesar", "Bermejo", "", "Securitas"));
@@ -81,7 +81,18 @@ public class Herramientas {
             return numCuenta;
         }
     }
- 
+    
+    private static int calculateModulus97(String iban) {
+        long total = 0;
+        for (int i = 0; i < iban.length(); i++) {
+            int charValue = Character.getNumericValue(iban.charAt(i));
+            total = (charValue > 9 ? total * 100 : total * 10) + charValue;
+            if (String.valueOf(total).length() > 9) {
+                total = (total % 97);
+            }
+        }
+        return (int)(total % 97);
+    }
     
     public static String generaIBAN (String numCuenta, String pais){
         String IBANcalc = "";
@@ -89,11 +100,19 @@ public class Herramientas {
         
         //Al final se incluyen las letras del pais con su valor en char sumado a 10 para que la A valga 10
         IBANcalc += (pais.charAt(0)-'A'+10) + (pais.charAt(1)-'A'+10) + "00";
-        Double IBANd = Double.parseDouble(IBANcalc);
         
         //Sacamos el resto de dividir por 97 y obtenemos la diferencia entre ese y 98
-        double resto = IBANd%97;
+        double resto = calculateModulus97(IBANcalc);
         resto = 98-resto;
+        
+        
+        
+        double auxDou=Double.parseDouble(IBANcalc);
+        
+	long auxInt1=(long) (auxDou%97);
+        System.out.println(auxInt1);
+	auxInt1=98-auxInt1;
+                
         String checkNums;
         if(resto<10){
             checkNums = "0" + Double.toString(resto);
