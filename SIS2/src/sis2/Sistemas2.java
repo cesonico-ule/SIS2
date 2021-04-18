@@ -18,7 +18,7 @@ import org.hibernate.Transaction;
  */
 public class Sistemas2 {
     
-    static String archivo = "resources\\SistemasInformacionII.xlsx";
+    static String fichero = "resources\\SistemasInformacionII.xlsx";
     static ManejadorExcel manejador = new ManejadorExcel();
     static ArrayList<String[]> datosTrabajadores = null;
     
@@ -29,7 +29,7 @@ public class Sistemas2 {
             consultaDNI("09741138V");
         */
         try{
-            datosTrabajadores = manejador.lecturaHoja(archivo, 3);
+            datosTrabajadores = manejador.lecturaHoja(fichero, 3);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -56,60 +56,102 @@ public class Sistemas2 {
                 case "1":
                     System.out.println("Comenzando la comprobación de los DNIs...");
                     compruebaDNIs();
-                break;
+                    break;
                 
                 case "2":
                     System.out.println("Comprobando los datos de IBAN de las cuentas bancarias...");
                     compruebaIBANs();
-                break;
+                    break;
                 
                 case "3":
                     System.out.println("Generando los emails de empresa de los trabajadores...");
                     creaEMAILs();
-                break;
+                    break;
                 
                 case "4":
                     System.out.println("Realizando todas las tareas...");
                     compruebaDNIs();
                     compruebaIBANs();
                     creaEMAILs();
-                break;
+                    break;
             }
         }
     }
     
     public static void compruebaDNIs(){
+        ArrayList <String> lista = new ArrayList<>();
         for (String[] str : datosTrabajadores) {
+            char letra = Herramientas.calculoNIE(str[7]);
+            //compara la letra que deberia ser con la que tiene
             
+            if (str[7] != null || str[7].length()!= 9 || "".equals(str[7])){
+                //el dni no es valido
+                
+                //Errores.generarErrorDNI(str)
+                
+                
+            }else{
+                System.out.println("DNI leido: "+str[7]);
+                if (lista.contains(str[7])){
+                    //Errores.generarErrorDNI(str);
+                }
+                else{
+                    lista.add(str[7]);
+                    if (letra != str[7].charAt(8)){
+                        //el dni no es correcto
+                        str[7] = str[7].replace(str[7].charAt(8), letra);
+                        //Errores.generarErrorDNI(str);
+                    }
+                }
+            }
         }
     }
     
     public static void compruebaIBANs(){
-        
+        for (String[] str : datosTrabajadores) {
+            String ccc = Herramientas.calculoCCC(str[9]); //anota el ccc correcto
+            String iban = Herramientas.generaIBAN(ccc, str[10]);
+            if (!ccc.equals(str[9])){//el CC NO es correcto
+                //Errores.generaErrorCCC(str);
+                //ManejadorExcel.actualizarCelda()
+            }
+            str[11] = iban;
+            //ManejadorExcel.actualizarCelda()
+                
+            
+        }
     }
     
     public static void creaEMAILs(){
         HashMap <String, Integer> lista = new HashMap<>();
         String correo;
         for (String[] str : datosTrabajadores) {
+            
                                                 //System.out.println("Paso 1");
-            if (str[5] == null){//no tiene 2º apellido
-                correo = ""+str[6].charAt(0)+str[4].charAt(0);
-                                                //System.out.println("Paso 2");
-            }else //tiene 2º apellido
-                correo = "" + str[6].charAt(0) + str[4].charAt(0) + str[5].charAt(0);
-                                                //System.out.println("Paso 3");
-
-            if (lista.get(correo) == null){ //no hay ninguno mas
-                lista.put(correo, 1);
-                correo += "00@";
+                                                
+            if (str[12] == null){//solo entra si no tiene email
+                if (str[5] == null){//no tiene 2º apellido
+                    correo = ""+str[6].charAt(0)+str[4].charAt(0);
+                    
+                                                    //System.out.println("Paso 2");
+                                                    
+                }else //tiene 2º apellido
+                    correo = ""+str[6].charAt(0) + str[4].charAt(0) + str[5].charAt(0);
                 
-            }else {//ya hay alguno con ese nombre
-                lista.put(correo, lista.get(correo)+1);
-                correo += String.format("%02d", lista.get(correo)) + "@";
+                                                    //System.out.println("Paso 3");
+
+                if (lista.get(correo) == null){ //no hay ninguno mas
+                    lista.put(correo, 1);
+                    correo += "00@";
+
+                }else {//ya hay alguno con ese nombre
+                    lista.put(correo, lista.get(correo)+1);
+                    correo += String.format("%02d", lista.get(correo)-1) + "@";
+                }
+                correo+= str[0] + ".com";
+                System.out.println(correo);
+                //ManejadorExcel.actualizarCelda(fichero, 3, hay_que_saber_la_fila, 12, correo);
             }
-            correo+= str[0] + ".com";
-            System.out.println(correo);
         }
     }
     
@@ -209,4 +251,6 @@ public class Sistemas2 {
         }
         
     }
+
+    
 }
