@@ -7,17 +7,6 @@ package sis2;
  */
 public class Herramientas {
     
-    public static void main (String [] Args){
-        String s = "11112223504444444444";
-        System.out.println(generaIBAN(s, "ES"));
-        
-        /*
-        System.out.println(generaEMAIL ("Cesar", "Bermejo", "", "Securitas"));
-        calculoCCC(s);
-        */
-    }
-    
-    
     // ||---------------------------- EJERCICIOS --------------------------|| 
     
     //*Le envias el DNI bien formateado y te devuelve la letra que le corresponde*
@@ -74,8 +63,6 @@ public class Herramientas {
             //---Ultimos 10 digitos---
             nuevoCodigo = nuevoCodigo.concat(numCuenta.substring(10, 20));
             
-            //---Llamar al metodo de corregir con el nuevoIban---
-            corrigeNum(nuevoCodigo);
             return nuevoCodigo;
         } else {
             System.out.println("El codigo de cuenta es correcto.\n");
@@ -117,33 +104,11 @@ public class Herramientas {
         return IBAN;
     }
     
-    //*Genera un email automatico con los datos del usuario*
-    public static String generaEMAIL (String nombre, String apellido1, String apellido2, String empresa){
-        //---Crea variable---
-        String email = "";
-        
-        //---Primera letra del nombre---
-        email += nombre.charAt(0);
-        
-        //---Primera letra del appellido---
-        email += apellido1.charAt(0);
-        
-        //---Primera letra del segundo appellido (si este existe)---
-        if(!apellido2.equals(""))email += apellido2.charAt(0);
-        
-        //---Cifra de repetición---
-        email += compruebaReps(email);
-        
-        //---Nombre de la empresa como dominio---
-        email += ("@" + empresa + ".com");
-
-        return email;
-    }
     
     // ||---------------------------- AUXILIAR --------------------------||
     
     //*Calcula el sumatorio de multiplicaciones que comprueba el numero de cuenta*
-    public static int bucleNum(String aux){
+    private static int bucleNum(String aux){
         int numero=0;
         int[] F ={1,2,4,8,5,10,9,7,3,6};
         
@@ -172,13 +137,7 @@ public class Herramientas {
         //System.out.println("Result: "+ numero);
         return numero;
     }
-    
-    // +++++++++++++++++ POR IMPLEMENTAR ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //*Llama al acceso al archivo de excel y corrige un codigo de cuenta bancaria incorrecto*
-    public static void corrigeNum (String numCuenta){
-        
-    }
-        
+      
     //*Calcula el modulo del IBAN entre 97 de manera mecanica*
     private static int calculateModulus97(String iban) {
         long total = 0;
@@ -191,14 +150,4 @@ public class Herramientas {
         }
         return (int)(total % 97);
     }
-    
-    // +++++++++++++++++ POR IMPLEMENTAR ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //*Comprueba el numero de personas con mismo correo hasta ahora y devuelve un String de dos cifras indicando dicho numero*
-    public static String compruebaReps (String email){
-        
-        
-        
-        return null;
-    }
-    
 }
