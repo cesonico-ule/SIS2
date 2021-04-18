@@ -2,6 +2,8 @@ package sistemas2;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.apache.poi.ss.usermodel.Cell;
@@ -75,5 +77,39 @@ public class ManejadorExcel {
         }
 
         return isEmpty;
+    }
+    public void actualizarCelda(String archivo, int hoja, int fila, int columna, String dato){
+
+        FileInputStream file = null;
+        XSSFWorkbook workbook = null;
+        XSSFSheet sheet;
+        Row row;
+        Cell cell;
+        FileOutputStream outFile;
+
+        try {
+            //declaraciones
+            file = new FileInputStream(new File(archivo));
+            workbook = new XSSFWorkbook(file);
+            sheet = workbook.getSheetAt(hoja - 1);
+            row = sheet.getRow(fila);
+            cell = row.getCell(columna);
+
+            if (cell == null) {
+                cell = row.createCell(columna);
+            }
+            //poner valores
+            cell.setCellValue(dato);
+            file.close();
+            outFile = new FileOutputStream(new File(archivo));
+            workbook.write(outFile);
+            outFile.close();
+            workbook.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
