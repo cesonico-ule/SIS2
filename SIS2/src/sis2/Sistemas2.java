@@ -37,7 +37,8 @@ public class Sistemas2 {
         
         boolean salir = false;
         Scanner sc = new Scanner(System.in);
-        
+        /*
+        Segunda practica - Comprobacion de DNI, IBAN y generar correos
         while(!salir){
             System.out.println(
                     "¿Que desea hacer?\n"+
@@ -76,6 +77,19 @@ public class Sistemas2 {
                     break;
             }
         }
+        */
+        
+            System.out.println("*** Introduzca el mes y año de la nomina a calcular ***");
+             
+            String[] parts = sc.next().split("-");
+            
+            if(parts[0].equals("06") || parts[0].equals("12")){
+                //Se generan tambien las nominas de la extra para aquellos que no este prorrateada
+                
+            } else {
+                //Default
+                
+            }
     }
     
     public static void compruebaDNIs(){
