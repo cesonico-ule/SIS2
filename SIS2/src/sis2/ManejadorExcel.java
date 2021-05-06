@@ -25,7 +25,7 @@ public class ManejadorExcel {
     public ArrayList<String[]> lecturaHoja(String archivo, int hoja) throws IOException{
         
         ArrayList<String[]> valoresCeldas = new ArrayList<String[]>();
-        String[] valoresFilas = new String[13]; //hay 13 campos en la hoja
+        String[] valoresFilas = new String[14]; //hay 13 campos en la hoja el 14 es la fila
         
         FileInputStream file = new FileInputStream(new File(archivo));
 	XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -42,15 +42,15 @@ public class ManejadorExcel {
                     if(celda.getRowIndex()!=0){ //no queremos los titulos de las tablas
                         if (celda.getColumnIndex()==3){ //esto tiene formato fecha
                             valoresFilas[celda.getColumnIndex()]=celda.getDateCellValue().toString();
-                            System.out.println(celda.getDateCellValue());
-                        }
-
+                            //System.out.println(celda.getDateCellValue());
+                        }                        
                         else{
                             valoresFilas[celda.getColumnIndex()]=celda.getStringCellValue();
-                            System.out.println(celda.getStringCellValue());
+                            //System.out.println(celda.getStringCellValue());
                         }
                     }
                 }
+                valoresFilas[13]= String.valueOf(fila.getRowNum());
                 if (fila.getRowNum() != 0) {
                     valoresCeldas.add(valoresFilas.clone());
                     for (int k = 0; k < valoresFilas.length; k++) {
@@ -78,6 +78,7 @@ public class ManejadorExcel {
 
         return isEmpty;
     }
+    
     public void actualizarCelda(String archivo, int hoja, int fila, int columna, String dato){
 
         FileInputStream file = null;
