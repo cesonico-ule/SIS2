@@ -79,7 +79,7 @@ public class ManejadorExcel {
         return isEmpty;
     }
     
-    public void actualizarCelda(String archivo, int hoja, int fila, int columna, String dato){
+    public static void actualizarCelda(String archivo, int hoja, int fila, int columna, String dato){
 
         FileInputStream file = null;
         XSSFWorkbook workbook = null;

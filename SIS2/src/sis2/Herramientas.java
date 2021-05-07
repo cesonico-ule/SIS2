@@ -1,4 +1,4 @@
-package sis2;
+package sistemas2;
 
 /**
  *
@@ -10,7 +10,7 @@ public class Herramientas {
     // ||---------------------------- EJERCICIOS --------------------------|| 
     
     //*Le envias el DNI bien formateado y te devuelve la letra que le corresponde*
-    public static char calculoNIE(String num){
+    public static char calculoDNI(String num){
         char[] base = {'T','R','W','A','G','M','Y','F','P','D','X','B','N','J',
             'Z','S','Q','V','H','L','C','K','E'};
         int numero;

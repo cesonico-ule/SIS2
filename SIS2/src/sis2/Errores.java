@@ -21,7 +21,8 @@ import org.w3c.dom.Element;
  
 public class Errores {
  
-    public static void generaErrorDNI(String[] persona){
+    public static void generaErrorDNI(EmpleadoWorbu empleado){
+        System.out.println("Error");/*
         String xmlFilePath = "resources\\ErroresDNI.xml";
         try {
             //ejemplo de xml
@@ -76,7 +77,7 @@ public class Errores {
             pce.printStackTrace();
         } catch (TransformerException tfe) {
             tfe.printStackTrace();
-        }
+        }*/
     }
    
     public static void generaErrorCCC(){

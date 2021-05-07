@@ -21,6 +21,7 @@ public class Sistemas2 {
     static String fichero = "resources\\SistemasInformacionII.xlsx";
     static ManejadorExcel manejador = new ManejadorExcel();
     static ArrayList<String[]> datosTrabajadores = null;
+    static ArrayList<EmpleadoWorbu> empleados = new ArrayList<>();
     
     public static void main(String[] args) {
         /*
@@ -34,7 +35,6 @@ public class Sistemas2 {
         catch (IOException e) {
             e.printStackTrace();
 	}
-        ArrayList<EmpleadoWorbu> empleados = new ArrayList<>();
         
         for(String[] datos: datosTrabajadores){
             EmpleadoWorbu aux = new EmpleadoWorbu(datos);
@@ -45,6 +45,7 @@ public class Sistemas2 {
         Scanner sc = new Scanner(System.in);
         /*
         Segunda practica - Comprobacion de DNI, IBAN y generar correos
+*/
         while(!salir){
             System.out.println(
                     "¿Que desea hacer?\n"+
@@ -81,61 +82,62 @@ public class Sistemas2 {
                     compruebaIBANs();
                     creaEMAILs();
                     break;
+                    
+                case "5":
+                    System.out.println("*** Introduzca el mes y año de la nomina a calcular ***");
+                    String[] parts = sc.next().split("-"); //parts[0]=mes parts[1]=año
+
+                    if (parts[0].equals("06") || parts[0].equals("12")) {
+                        //Se generan tambien las nominas de la extra para aquellos que no este prorrateada
+
+                    } else {
+                        //Default
+
+                    }
             }
         }
-        */
         
-            System.out.println("*** Introduzca el mes y año de la nomina a calcular ***");
-             
-            String[] parts = sc.next().split("-");
+        
             
-            if(parts[0].equals("06") || parts[0].equals("12")){
-                //Se generan tambien las nominas de la extra para aquellos que no este prorrateada
-                
-            } else {
-                //Default
-                
-            }
     }
     
-    public static void compruebaDNIs(){
-        ArrayList <String> lista = new ArrayList<>();
-        for (String[] str : datosTrabajadores) {
-            char letra = Herramientas.calculoNIE(str[7]);
-            //compara la letra que deberia ser con la que tiene
-            
-            if (str[7] != null || str[7].length()!= 9 || "".equals(str[7])){
-                //el dni no es valido
+    public static void compruebaDNIs() {
+        ArrayList<String> lista = new ArrayList<>();
+
+        for (EmpleadoWorbu str : empleados) {
+            if (str.getDni() == null || str.getDni()=="") {//no tiene DNI - error
+                System.out.println("DNI en blanco - Error");
+                Errores.generaErrorDNI(str);
                 
-                //Errores.generarErrorDNI(str)
+            } else {
+                char letra = Herramientas.calculoDNI(str.getDni());
+                System.out.println("DNI leido: " + str.getDni().substring(0, 7));
                 
-                
-            }else{
-                System.out.println("DNI leido: "+str[7]);
-                if (lista.contains(str[7])){
-                    //Errores.generarErrorDNI(str);
-                }
-                else{
-                    lista.add(str[7]);
-                    if (letra != str[7].charAt(8)){
-                        //el dni no es correcto
-                        str[7] = str[7].replace(str[7].charAt(8), letra);
-                        //Errores.generarErrorDNI(str);
+                if (lista.contains(str.getDni())) {//DNI ya procesado - error
+                    System.out.println("DNI ya procesado - Error");
+                    Errores.generaErrorDNI(str);
+                    
+                } else {//entramos cuando hay que procesar el DNI
+                    lista.add(str.getDni().substring(0, 7));
+                    if (letra != str.getDni().charAt(8)) {//letra no coincide
+                        System.out.println("Actualizando DNI");
+                        ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 7, str.getDni().replace(str.getDni().charAt(8), letra));
                     }
+                    //DNI correcto - no hacer nada
                 }
             }
         }
     }
     
     public static void compruebaIBANs(){
-        for (String[] str : datosTrabajadores) {
-            String ccc = Herramientas.calculoCCC(str[9]); //anota el ccc correcto
-            String iban = Herramientas.generaIBAN(ccc, str[10]);
-            if (!ccc.equals(str[9])){//el CC NO es correcto
+        for (EmpleadoWorbu str : empleados) {
+            String ccc = Herramientas.calculoCCC(str.getCodCuenta()); //anota el ccc correcto
+            String iban = Herramientas.generaIBAN(ccc, str.getPaisCuenta());
+            if (!ccc.equals(str.getPaisCuenta())){//el CC NO es correcto
                 //Errores.generaErrorCCC(str);
                 //ManejadorExcel.actualizarCelda()
             }
-            str[11] = iban;
+            str.setIban(iban);
             //ManejadorExcel.actualizarCelda()
                 
             
