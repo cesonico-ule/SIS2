@@ -25,7 +25,7 @@ public class EmpleadoWorbu {
     public int fila;
     
     public EmpleadoWorbu(String[] datos){
-             
+        actualizaDatos(datos);     
         /*
         0 - Nombre empresa
         1 - Cif empresa
@@ -42,7 +42,8 @@ public class EmpleadoWorbu {
         12 - Email
         13 - Fila
         */    
-        
+    }
+    public void actualizaDatos(String[] datos){
         nombreEmpresa = datos[0];
         cifEmpresa = datos[1];
         categoria = datos[2];
@@ -51,12 +52,16 @@ public class EmpleadoWorbu {
         apellido2 = datos[5];
         nombre = datos[6];
         nif = datos[7];
-        prorrata = datos[8];
+        
+        if (datos[8].equals("SI")){
+            prorrata = true;
+        }else prorrata = false;
+        
         codCuenta = datos[9];
         paisCuenta = datos[10];
         iban = datos[11];
         email = datos[12];
-        fila = datos[13];
+        fila = Integer.valueOf(datos[13]);
         
         
         /*
