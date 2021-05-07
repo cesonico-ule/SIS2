@@ -34,6 +34,12 @@ public class Sistemas2 {
         catch (IOException e) {
             e.printStackTrace();
 	}
+        ArrayList<EmpleadoWorbu> empleados = new ArrayList<>();
+        
+        for(String[] datos: datosTrabajadores){
+            EmpleadoWorbu aux = new EmpleadoWorbu(datos);
+            empleados.add(aux);
+        }
         
         boolean salir = false;
         Scanner sc = new Scanner(System.in);
