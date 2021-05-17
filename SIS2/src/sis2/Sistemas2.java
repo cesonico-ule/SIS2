@@ -129,20 +129,19 @@ public class Sistemas2 {
         }
     }
     
-    public static void compruebaIBANs(){
+        public static void compruebaIBANs(){
         for (EmpleadoWorbu str : empleados) {
             String ccc = Herramientas.calculoCCC(str.getCodCuenta()); //anota el ccc correcto
             String iban = Herramientas.generaIBAN(ccc, str.getPaisCuenta());
-            if (!ccc.equals(str.getPaisCuenta())){//el CC NO es correcto
-                //Errores.generaErrorCCC(str);
-                //ManejadorExcel.actualizarCelda()
+            if (!iban.equals(str.getIban())){//el CC NO es correcto
+                Errores.generaErrorCCC(iban);
+                ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 11, iban);
+                str.setIban(iban);
             }
-            str.setIban(iban);
-            //ManejadorExcel.actualizarCelda()
-                
             
         }
     }
+
     
     public static void creaEMAILs(){
         HashMap <String, Integer> lista = new HashMap<>();
