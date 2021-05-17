@@ -105,7 +105,7 @@ public class Sistemas2 {
         ArrayList<String> lista = new ArrayList<>();
 
         for (EmpleadoWorbu str : empleados) {
-            if (str.getDni() == null || str.getDni()=="") {//no tiene DNI - error
+            if (str.getDni() == null || str.getDni()== "") {//no tiene DNI - error
                 System.out.println("DNI en blanco - Error");
                 Errores.generaErrorDNI(str);
                 
@@ -147,32 +147,39 @@ public class Sistemas2 {
     public static void creaEMAILs(){
         HashMap <String, Integer> lista = new HashMap<>();
         String correo;
-        for (String[] str : datosTrabajadores) {
-            
-                                                //System.out.println("Paso 1");
-                                                
-            if (str[12] == null){//solo entra si no tiene email
-                if (str[5] == null){//no tiene 2º apellido
-                    correo = ""+str[6].charAt(0)+str[4].charAt(0);
+        
+        //recoger los correos que ya existen
+        for (EmpleadoWorbu str : empleados) {
+            if (str.getEmail() != null){
+                String[] aux = str.getEmail().split("\\d");//correo
+                String nume = str.getEmail().substring(aux[0].length(),aux[0].length()+2);//numero
+                int num = Integer.parseInt(nume);
+                lista.put(aux[0],num+1);
+            }
+        }
+        //generar correos nuevos
+        for(EmpleadoWorbu str : empleados){
+            if (str.getEmail() == null){ //solo generamos correo para los que no tienen
+                if (str.getApellido2() == null){ //no tiene 2º apellido
+                    // primera letra del nombre y del 1º apellido
+                    correo = ""+str.getNombre().charAt(0)+str.getApellido1().charAt(0);
                     
-                                                    //System.out.println("Paso 2");
-                                                    
-                }else //tiene 2º apellido
-                    correo = ""+str[6].charAt(0) + str[4].charAt(0) + str[5].charAt(0);
+                }else
+                    //si tiene 2º apellido le ponemos tmb su letra
+                    correo = ""+str.getNombre().charAt(0)+str.getApellido1().charAt(0) + str.getApellido2().charAt(0);
                 
-                                                    //System.out.println("Paso 3");
-
-                if (lista.get(correo) == null){ //no hay ninguno mas
+                if (lista.get(correo) == null){ //no hay ningun correo igual
                     lista.put(correo, 1);
                     correo += "00@";
-
-                }else {//ya hay alguno con ese nombre
+                    
+                }else{ //ya hay correos iguales
+                    correo += String.format("%02d", lista.get(correo)) + "@";
                     lista.put(correo, lista.get(correo)+1);
-                    correo += String.format("%02d", lista.get(correo)-1) + "@";
                 }
-                correo+= str[0] + ".com";
+                correo+= str.getNombreEmpresa() + ".com";
                 System.out.println(correo);
-                //ManejadorExcel.actualizarCelda(fichero, 3, hay_que_saber_la_fila, 12, correo);
+                str.setEmail(correo);
+                ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 12, correo);
             }
         }
     }
