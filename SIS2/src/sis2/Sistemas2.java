@@ -103,11 +103,12 @@ public class Sistemas2 {
     
     public static void compruebaDNIs() {
         ArrayList<String> lista = new ArrayList<>();
+        ArrayList<EmpleadoWorbu> errorEmp = new ArrayList();
 
         for (EmpleadoWorbu str : empleados) {
             if (str.getDni() == null || str.getDni()== "") {//no tiene DNI - error
                 System.out.println("DNI en blanco - Error");
-                Errores.generaErrorDNI(str);
+                errorEmp.add(str);
                 
             } else {
                 char letra = Herramientas.calculoDNI(str.getDni());
@@ -115,7 +116,7 @@ public class Sistemas2 {
                 
                 if (lista.contains(str.getDni())) {//DNI ya procesado - error
                     System.out.println("DNI ya procesado - Error");
-                    Errores.generaErrorDNI(str);
+                    errorEmp.add(str);
                     
                 } else {//entramos cuando hay que procesar el DNI
                     lista.add(str.getDni().substring(0, 7));
@@ -127,19 +128,28 @@ public class Sistemas2 {
                 }
             }
         }
+        Errores.generaErrorDNI(errorEmp);
     }
     
-        public static void compruebaIBANs(){
+    public static void compruebaIBANs() {
+        ArrayList<EmpleadoWorbu> errorEmp = new ArrayList();
+
         for (EmpleadoWorbu str : empleados) {
             String ccc = Herramientas.calculoCCC(str.getCodCuenta()); //anota el ccc correcto
             String iban = Herramientas.generaIBAN(ccc, str.getPaisCuenta());
-            if (!iban.equals(str.getIban())){//el CC NO es correcto
-                Errores.generaErrorCCC(iban);
-                ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 11, iban);
+            if (!ccc.equals(str.getCodCuenta())) {//el CC NO es correcto
+                str.setCCCError(str.getCodCuenta());
+                str.setCodCuenta(ccc);
                 str.setIban(iban);
+                errorEmp.add(str);
+                ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 9, ccc);
+                ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 11, iban);
+            } else {
+                str.setIban(iban);
+                ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 11, iban);
             }
-            
         }
+        Errores.generaErrorCCC(errorEmp);
     }
 
     
