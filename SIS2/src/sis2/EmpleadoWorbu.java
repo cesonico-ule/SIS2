@@ -17,6 +17,7 @@ public class EmpleadoWorbu {
     private String dni;
     private boolean prorrata;
     private String codCuenta;
+    private String cccError;
     private String paisCuenta;
     private String iban;
     private String email;
@@ -164,7 +165,14 @@ public class EmpleadoWorbu {
     public void setFila(int fila) {
         this.fila = fila;
     }
-
+    
+    public void setCCCError(String cccError){
+        this.cccError = cccError;
+    }
+    public String getCCCError(){
+        return cccError;
+    }
+    
     public String getNombreEmpresa() {
         return nombreEmpresa;
     }
