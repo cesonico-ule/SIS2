@@ -11,7 +11,9 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import java.util.Date;
+import java.text.SimpleDateFormat;
+;
 /**
  *
  * @author Ares Alfayate Santiago
@@ -41,12 +43,17 @@ public class ManejadorExcel {
 
                     if(celda.getRowIndex()!=0){ //no queremos los titulos de las tablas
                         if (celda.getColumnIndex()==3){ //esto tiene formato fecha
-                            valoresFilas[celda.getColumnIndex()]=celda.getDateCellValue().toString();
-                            //System.out.println(celda.getDateCellValue());
+                            
+                            Date date = celda.getDateCellValue();
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+                            String fecha = formatter.format(date);
+                            System.out.println(fecha);
+                                                        
+                            valoresFilas[celda.getColumnIndex()] = fecha;
+
                         }                        
                         else{
                             valoresFilas[celda.getColumnIndex()]=celda.getStringCellValue();
-                            //System.out.println(celda.getStringCellValue());
                         }
                     }
                 }
