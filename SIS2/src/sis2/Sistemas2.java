@@ -319,8 +319,19 @@ public class Sistemas2 {
         double calculoirpf;
         double brutoMes;
         double cantidadProrrateo;
+        double salarioBase;
         int trienio = 70;
         boolean cambio_trienio = false;
+        
+        double contingencias;
+        double desempleo;
+        double formacion;
+        
+        double contingenciasEmpresario;
+        double desempleoEmpresario;
+        double formacionEmpresario;
+        double accidentesEmpresario;
+        double fogasaEmpresario;
         
         for (EmpleadoWorbu str : empleados) {
             //if 
@@ -347,44 +358,74 @@ public class Sistemas2 {
                 
             }
 */
-        if (!cambio_trienio){
-            //hacer calculo trienio 0 de momento
+            if (!cambio_trienio){
+                //hacer calculo trienio 0 de momento
 
-            calculoBase = bruto[0]/14 + bruto[1]/14 + trienio; //cantidadProrrateo;
-            cantidadProrrateo = calculoBase/6;
-            calculoBase = calculoBase + cantidadProrrateo;
-            
-            double[] cuotas = datosCuotas.datosCuotas();
-            for (int i=0; i<8; i++){
-                cuotas[i] *= calculoBase/100;
-            }
-            System.out.println(")");
-            SalarioDatos cuotasNomina = new SalarioDatos(cuotas);
-            
-            calculoirpf = brutoAnual + trienio*14;
-            double tramo_irpf = (calculoirpf - calculoirpf%1000) + 1000;
-            double porcentajeIRPF = brutoExcel.get(tramo_irpf);
-            
-            if (str.isProrrata()){
-                irpf =  (bruto[0] + bruto[1] + 70*14) * porcentajeIRPF / 100;
-                System.out.println("Salario Base con prorrateo: " + bruto[0]/14);
+                calculoBase = bruto[0]/14 + bruto[1]/14 + trienio; //cantidadProrrateo;
+                cantidadProrrateo = calculoBase/6;
+                calculoBase = calculoBase + cantidadProrrateo;
+
+                double[] cuotas = datosCuotas.datosCuotas();
+                for (int i=0; i<8; i++){
+                    cuotas[i] *= calculoBase/100;
+                }
                 
-            } else {
-                irpf = (calculoBase - cantidadProrrateo) * porcentajeIRPF / 100;
-                System.out.println("Salario Base sin prorrateo: " + (bruto[0] - cantidadProrrateo)/14);
-            }
-            
-            System.out.println("Calculo Base: "+ calculoBase);
-            System.out.println("Complemento: "+ bruto[1]/14);
-            System.out.println("Prorrateo: "+ cantidadProrrateo);
-            System.out.println("DNI: "+ str.getDni());
-            System.out.println("CalcBase: "+brutoAnual);
-            System.out.println("Tramo IRPF: "+tramo_irpf);
-            System.out.println("Porcentaje IRPF: "+ porcentajeIRPF);
-            System.out.println("IRPF: "+ irpf);
+                calculoirpf = brutoAnual + trienio*14;
+                double tramo_irpf = (calculoirpf - calculoirpf%1000) + 1000;
+                double porcentajeIRPF = brutoExcel.get(tramo_irpf);
 
-            System.out.println("-------------------------------------------------");
-        }
+                if (str.isProrrata()){
+                    irpf =  (bruto[0] + bruto[1] + trienio*14) * porcentajeIRPF / 100;
+                    salarioBase = bruto[0]/14;
+
+                } else {
+                    irpf = (calculoBase - cantidadProrrateo) * porcentajeIRPF / 100;
+                    salarioBase = (bruto[0] - cantidadProrrateo) / 14;
+                }
+
+                //Contingencias
+                contingencias = calculoBase * datosCuotas.getCuotaObreraGeneralTrabajador()/100;
+                desempleo = calculoBase * datosCuotas.getCuotaDesempleoTrabajador()/100;
+                formacion = calculoBase * datosCuotas.getCuotaFormacionTrabajador()/100;
+                
+                //Empresario
+                contingenciasEmpresario = calculoBase * datosCuotas.getContingenciasComunesEmpresario()/100;
+                desempleoEmpresario = calculoBase * datosCuotas.getDesmpleoEmpresario()/100;
+                formacionEmpresario = calculoBase * datosCuotas.getFormacionEmpresario()/100;
+                accidentesEmpresario = calculoBase * datosCuotas.getAccidentesTrabajoEmpresario()/100;
+                fogasaEmpresario = calculoBase * datosCuotas.getFogasaEmpresario()/100;
+                // --- IMPRIMIR ---
+
+                System.out.println("DNI: "+ str.getDni() + "\n");
+
+                System.out.println("Salario Base: "+ salarioBase);
+                System.out.println("Prorrateo: "+ cantidadProrrateo);            
+                System.out.println("Complemento: "+ bruto[1]/14);
+                System.out.println("Antiguedad: "+ trienio+ "\n");
+                
+                System.out.println("Contingencias generales: " + contingencias);
+                System.out.println("Desempleo: " + desempleo);
+                System.out.println("Cuota formación: " + formacion);
+                System.out.println("IRPF: "+ irpf + "\n");
+
+                //Total deducciones, total devengos, Liquido a percibir
+                
+                System.out.println("Calculo empresario BASE: "+ calculoBase);
+                
+                System.out.println("Contingencias comunes empresario: "+ contingenciasEmpresario);
+                System.out.println("Desempleo: "+ desempleoEmpresario);
+                System.out.println("Formación: "+ formacionEmpresario);
+                System.out.println("Accidentes de trabajo: "+ accidentesEmpresario);
+                System.out.println("FOGASA: "+ fogasaEmpresario+"\n");
+                
+                System.out.println("Total empresario: " + "\n");
+                
+                System.out.println("COSTE TOTAL TRABAJADOR: ");
+                System.out.println("-------------------------------------------------");
+                //System.out.println("Tramo IRPF: "+tramo_irpf);
+                //System.out.println("Porcentaje IRPF: "+ porcentajeIRPF);
+                //System.out.println("Bruto Anual: "+brutoAnual);
+            }
         }
     }
 
