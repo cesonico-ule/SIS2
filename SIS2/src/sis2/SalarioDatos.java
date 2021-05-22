@@ -26,6 +26,18 @@ public class SalarioDatos {
         formacionEmpresario = datos[6];
         accidentesTrabajoEmpresario = datos[7];
     }
+    public double[] datosCuotas(){
+        double[] datos = new double [8];
+        datos[0] = cuotaObreraGeneralTrabajador;
+        datos[1] = cuotaDesempleoTrabajador;
+        datos[2] = cuotaFormacionTrabajador;
+        datos[3] = contingenciasComunesEmpresario;
+        datos[4] = fogasaEmpresario;
+        datos[5] = desmpleoEmpresario;
+        datos[6] = formacionEmpresario;
+        datos[7] = accidentesTrabajoEmpresario;
+        return datos;
+    }
 
     public double getCuotaObreraGeneralTrabajador() {
         return cuotaObreraGeneralTrabajador;
