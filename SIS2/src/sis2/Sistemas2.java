@@ -62,7 +62,7 @@ public class Sistemas2 {
         Scanner sc = new Scanner(System.in);
         
         System.out.println("Prueba");
-        generaNominas("03","2018");
+        generaNominas("12","2021");
         
         
 /*
@@ -315,10 +315,11 @@ public class Sistemas2 {
         double calculoBase;
         double brutoAnual;
         double[] bruto;
-        double irpf_p;
-        double irpf_s;
+        double irpf;
+        double calculoirpf;
         double brutoMes;
-        int trienio = 0;
+        double cantidadProrrateo;
+        int trienio = 70;
         boolean cambio_trienio = false;
         
         for (EmpleadoWorbu str : empleados) {
@@ -348,8 +349,10 @@ public class Sistemas2 {
 */
         if (!cambio_trienio){
             //hacer calculo trienio 0 de momento
-            
-            calculoBase = bruto[0]/14 + bruto[1]/14 + trienio + brutoAnual/84;
+
+            calculoBase = bruto[0]/14 + bruto[1]/14 + trienio; //cantidadProrrateo;
+            cantidadProrrateo = calculoBase/6;
+            calculoBase = calculoBase + cantidadProrrateo;
             
             double[] cuotas = datosCuotas.datosCuotas();
             for (int i=0; i<8; i++){
@@ -358,18 +361,27 @@ public class Sistemas2 {
             System.out.println(")");
             SalarioDatos cuotasNomina = new SalarioDatos(cuotas);
             
-            if (str.isProrrata()){
-                
-            }
-            double tramo_irpf = (brutoAnual - brutoAnual%1000);
+            calculoirpf = brutoAnual + trienio*14;
+            double tramo_irpf = (calculoirpf - calculoirpf%1000) + 1000;
             double porcentajeIRPF = brutoExcel.get(tramo_irpf);
             
+            if (str.isProrrata()){
+                irpf =  (bruto[0] + bruto[1] + 70*14) * porcentajeIRPF / 100;
+                System.out.println("Salario Base con prorrateo: " + bruto[0]/14);
+                
+            } else {
+                irpf = (calculoBase - cantidadProrrateo) * porcentajeIRPF / 100;
+                System.out.println("Salario Base sin prorrateo: " + (bruto[0] - cantidadProrrateo)/14);
+            }
             
-            
-            
+            System.out.println("Calculo Base: "+ calculoBase);
+            System.out.println("Complemento: "+ bruto[1]/14);
+            System.out.println("Prorrateo: "+ cantidadProrrateo);
+            System.out.println("DNI: "+ str.getDni());
             System.out.println("CalcBase: "+brutoAnual);
-            System.out.println("Tramo irpf: "+tramo_irpf);
-            System.out.println("irpf: "+ porcentajeIRPF);
+            System.out.println("Tramo IRPF: "+tramo_irpf);
+            System.out.println("Porcentaje IRPF: "+ porcentajeIRPF);
+            System.out.println("IRPF: "+ irpf);
 
             System.out.println("-------------------------------------------------");
         }
