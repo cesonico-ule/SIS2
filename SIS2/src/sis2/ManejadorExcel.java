@@ -13,7 +13,9 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author Ares Alfayate Santiago
@@ -24,14 +26,14 @@ public class ManejadorExcel {
     /*
      Recibe la hoja X del archivo Y como lista de datos
     */
-    public ArrayList<String[]> lecturaHoja(String archivo, int hoja) throws IOException{
+    public ArrayList<EmpleadoWorbu> lecturaTrabajadores(String archivo) throws IOException{
         
         ArrayList<String[]> valoresCeldas = new ArrayList<String[]>();
         String[] valoresFilas = new String[14]; //hay 13 campos en la hoja el 14 es la fila
         
         FileInputStream file = new FileInputStream(new File(archivo));
 	XSSFWorkbook workbook = new XSSFWorkbook(file);
-	XSSFSheet sheet = workbook.getSheetAt(hoja-1);
+	XSSFSheet sheet = workbook.getSheetAt(2);
         
         //estoy en la hoja que he querido leer
         //leo todas las filas
@@ -47,13 +49,13 @@ public class ManejadorExcel {
                             Date date = celda.getDateCellValue();
                             SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
                             String fecha = formatter.format(date);
-                            System.out.println(fecha);
+                            //System.out.println(fecha);
                                                         
                             valoresFilas[celda.getColumnIndex()] = fecha;
 
                         }                        
                         else{
-                            valoresFilas[celda.getColumnIndex()]=celda.getStringCellValue();
+                            valoresFilas[celda.getColumnIndex()] = celda.getStringCellValue();
                         }
                     }
                 }
@@ -67,7 +69,12 @@ public class ManejadorExcel {
             }
         }
         workbook.close();
-        return valoresCeldas;
+        ArrayList<EmpleadoWorbu> empleados = null;
+        for(String[] datos: valoresCeldas){
+            EmpleadoWorbu aux = new EmpleadoWorbu(datos);
+            empleados.add(aux);
+        }
+        return empleados;
     }
     
     private static boolean isRowEmpty(Row row) {
@@ -119,5 +126,90 @@ public class ManejadorExcel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    public Map<String, double[]> leerCategorias(String archivo)throws IOException{
+        
+        Map<String, double[]> salarioBase = new HashMap<>();
+                
+        FileInputStream file = new FileInputStream(new File(archivo));
+	XSSFWorkbook workbook = new XSSFWorkbook(file);
+	XSSFSheet sheet = workbook.getSheetAt(0);
+        
+        for (int i=1; i<15; i++){//recorre las 14 primeras filas
+            String categoria = sheet.getRow(i).getCell(0).getStringCellValue();//Nombre categoria
+            //System.out.println("Categoria: " + categoria);
+            double salario = sheet.getRow(i).getCell(1).getNumericCellValue(); //Valor salario
+            //System.out.println("Salario: "+salario);
+            double complemento = sheet.getRow(i).getCell(2).getNumericCellValue(); //Valor complemento
+            //System.out.println("Comp: "+complemento);
+           
+            double[] aux = {salario,complemento};
+            salarioBase.put(categoria, aux);            
+        }
+        workbook.close();
+        return salarioBase;
+        
+    }
+    public ArrayList<Double> leerTrienios(String archivo)throws IOException{
+        
+        ArrayList<Double> trienios = new ArrayList<>();
+        trienios.add(0.0);
+        
+        FileInputStream file = new FileInputStream(new File(archivo));
+	XSSFWorkbook workbook = new XSSFWorkbook(file);
+	XSSFSheet sheet = workbook.getSheetAt(0);
+        
+        for (int i=1; i<19; i++){//recorre las 18 primeras filas
+            double trienio = sheet.getRow(i).getCell(5).getNumericCellValue();//Nombre categoria
+            //System.out.println("Trienio: " + trienio);
+            double valor = sheet.getRow(i).getCell(6).getNumericCellValue(); //Valor salario
+            //System.out.println("Valor: " + valor);
+            
+            trienios.add(valor);
+            
+        }
+        workbook.close();
+        return trienios;
+    }
+    public Map<Double, Double> leerBruto(String archivo)throws IOException{
+        
+        Map<Double, Double> trienios = new HashMap<>();
+                
+        FileInputStream file = new FileInputStream(new File(archivo));
+	XSSFWorkbook workbook = new XSSFWorkbook(file);
+	XSSFSheet sheet = workbook.getSheetAt(1);
+        
+        for (int i=1; i<50; i++){//recorre las 18 primeras filas
+            double bruto = sheet.getRow(i).getCell(0).getNumericCellValue();//Nombre categoria
+            //System.out.println("Bruto: " + bruto);
+            double valor = sheet.getRow(i).getCell(1).getNumericCellValue(); //Valor salario
+            //System.out.println("Valor: " + valor);
+            
+            trienios.put(bruto, valor);
+            
+        }
+        workbook.close();
+        return trienios;
+    }
+    
+    public SalarioDatos leerCuotas(String archivo)throws IOException{
+        
+        double[] cuotas = new double [8];
+        
+        FileInputStream file = new FileInputStream(new File(archivo));
+	XSSFWorkbook workbook = new XSSFWorkbook(file);
+	XSSFSheet sheet = workbook.getSheetAt(1);
+        
+        for (int i=0; i<8; i++){//recorre las 18 primeras filas
+            
+            double valor = sheet.getRow(i).getCell(6).getNumericCellValue(); //Valor salario
+            
+            cuotas[i] = valor;
+            
+        }
+        workbook.close();
+        SalarioDatos aux = new SalarioDatos(cuotas);
+        return aux;
     }
 }

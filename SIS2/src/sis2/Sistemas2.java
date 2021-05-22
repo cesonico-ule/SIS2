@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import org.hibernate.Query;
@@ -20,9 +21,12 @@ public class Sistemas2 {
     
     static String fichero = "resources\\SistemasInformacionII.xlsx";
     static ManejadorExcel manejador = new ManejadorExcel();
-    static ArrayList<String[]> datosTrabajadores = null;
     static ArrayList<EmpleadoWorbu> empleados = new ArrayList<>();
-    
+    static Map<String, double[]> categorias = null; 
+    static ArrayList<Double> trienios = null; 
+    static Map<Double, Double> bruto = null; 
+    static SalarioDatos datosCuotas = null;
+            
     public static void main(String[] args) {
         /*
             Primera practica - conexion con base de datos
@@ -30,29 +34,35 @@ public class Sistemas2 {
             consultaDNI("09741138V");
         */
         try{
-            datosTrabajadores = manejador.lecturaHoja(fichero, 3);
+            empleados = manejador.lecturaTrabajadores(fichero);
+            categorias = manejador.leerCategorias(fichero);
+            trienios = manejador.leerTrienios(fichero);
+            bruto = manejador.leerBruto(fichero);
+            datosCuotas = manejador.leerCuotas(fichero);
         }
         catch (IOException e) {
             e.printStackTrace();
 	}
         
-        for(String[] datos: datosTrabajadores){
-            EmpleadoWorbu aux = new EmpleadoWorbu(datos);
-            empleados.add(aux);
-        }
+        
+        
+        /*
+        _____________Fin obtencion de Datos_____________
+        */
+        
+        
         
         boolean salir = false;
         Scanner sc = new Scanner(System.in);
-        /*
-        Segunda practica - Comprobacion de DNI, IBAN y generar correos
-*/
+        
         while(!salir){
             System.out.println(
                     "¿Que desea hacer?\n"+
                     "1. Comprobar los DNIs\n"+
                     "2. Comprobar y generar las cuentas bancarias\n"+
                     "3. Generar los emails\n"+
-                    "4. Tarea completa\n"+
+                    "4. Tarea 2 completa\n"+
+                    "5. Generar nominas"+
                     "\n0. Salir\n");
             
             switch(sc.next()){
@@ -96,9 +106,7 @@ public class Sistemas2 {
                     }
             }
         }
-        
-        
-            
+         
     }
     
     public static void compruebaDNIs() {
@@ -151,7 +159,6 @@ public class Sistemas2 {
         }
         Errores.generaErrorCCC(errorEmp);
     }
-
     
     public static void creaEMAILs(){
         HashMap <String, Integer> lista = new HashMap<>();
@@ -290,5 +297,7 @@ public class Sistemas2 {
         
     }
 
-    
+    public static void generaNominas(){
+        
+    }
 }
