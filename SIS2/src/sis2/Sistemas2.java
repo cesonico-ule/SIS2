@@ -2,13 +2,10 @@ package sistemas2;
 
 import Modelo.*;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +38,7 @@ public class Sistemas2 {
             consultaDNI("09741138V");
          */
         try {
+            //Lectura excel
             datosTrabajadores = manejador.lecturaTrabajadores(fichero);
             categorias = manejador.leerCategorias(fichero);
             trienios = manejador.leerTrienios(fichero);
@@ -54,18 +52,18 @@ public class Sistemas2 {
             EmpleadoWorbu aux = new EmpleadoWorbu(datos);
             empleados.add(aux);
         }
-
         /*
-        _____________Fin obtencion de Datos_____________
+___________________Fin obtencion de ___________________
          */
-        boolean salir = false;
+
+//        compruebaDNIs();
+//        compruebaIBANs();
+//        creaEMAILs();
+        generaNominas("12/2021");
+        
+        
+/*      boolean salir = false;
         Scanner sc = new Scanner(System.in);
-        
-        System.out.println("Prueba");
-        generaNominas("12","2021");
-        
-        
-/*
         while (!salir) {
             System.out.println(
                     "¿Que desea hacer?\n"
@@ -177,7 +175,7 @@ public class Sistemas2 {
     }
 
     public static void creaEMAILs() {
-        HashMap<String, Integer> lista = new HashMap<>();
+        Map<String, Integer> lista = new HashMap<>();
         String correo;
 
         //recoger los correos que ya existen
@@ -311,7 +309,7 @@ public class Sistemas2 {
 
     }
 
-    public static void generaNominas(String mes, String ano) {
+    public static void generaNominas(String fecha) {
         double calculoBase;
         double brutoAnual;
         double[] bruto;
@@ -323,24 +321,15 @@ public class Sistemas2 {
         int trienio = 70;
         boolean cambio_trienio = false;
         
-        double contingencias;
-        double desempleo;
-        double formacion;
-        
-        double contingenciasEmpresario;
-        double desempleoEmpresario;
-        double formacionEmpresario;
-        double accidentesEmpresario;
-        double fogasaEmpresario;
-        
         for (EmpleadoWorbu str : empleados) {
-            //if 
+            
             DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/uuuu");
             LocalDate alta = LocalDate.parse(str.getFechaAltaEmpresa(), formato);
-            LocalDate fecha = LocalDate.parse("01/"+mes+"/"+ano, formato);
+            LocalDate fech = LocalDate.parse("01/"+fecha, formato);
+            cambio_trienio = cambioTrienio(fech,alta);
             
-            int anos = (int) ChronoUnit.YEARS.between(alta, fecha);
-            int meses = (int) ChronoUnit.MONTHS.between(alta, fecha);
+            int anos = (int) ChronoUnit.YEARS.between(alta, fech);
+            //int meses = (int) ChronoUnit.MONTHS.between(alta, fecha);
             //System.out.println(anos);
                 
             
@@ -359,77 +348,99 @@ public class Sistemas2 {
             }
 */
             if (!cambio_trienio){
-                //hacer calculo trienio 0 de momento
+                //hacer calculo trienio, a mano de momento
 
-                calculoBase = bruto[0]/14 + bruto[1]/14 + trienio; //cantidadProrrateo;
+                calculoBase = bruto[0]/14 + bruto[1]/14 + trienio;
                 cantidadProrrateo = calculoBase/6;
                 calculoBase = calculoBase + cantidadProrrateo;
 
-                double[] cuotas = datosCuotas.datosCuotas();
-                for (int i=0; i<8; i++){
-                    cuotas[i] *= calculoBase/100;
-                }
                 
                 calculoirpf = brutoAnual + trienio*14;
                 double tramo_irpf = (calculoirpf - calculoirpf%1000) + 1000;
                 double porcentajeIRPF = brutoExcel.get(tramo_irpf);
 
                 if (str.isProrrata()){
-                    irpf =  (bruto[0] + bruto[1] + trienio*14) * porcentajeIRPF / 100;
+                    irpf =  calculoBase * porcentajeIRPF / 100;
                     salarioBase = bruto[0]/14;
 
                 } else {
                     irpf = (calculoBase - cantidadProrrateo) * porcentajeIRPF / 100;
                     salarioBase = (bruto[0] - cantidadProrrateo) / 14;
                 }
-
-                //Contingencias
-                contingencias = calculoBase * datosCuotas.getCuotaObreraGeneralTrabajador()/100;
-                desempleo = calculoBase * datosCuotas.getCuotaDesempleoTrabajador()/100;
-                formacion = calculoBase * datosCuotas.getCuotaFormacionTrabajador()/100;
                 
-                //Empresario
-                contingenciasEmpresario = calculoBase * datosCuotas.getContingenciasComunesEmpresario()/100;
-                desempleoEmpresario = calculoBase * datosCuotas.getDesmpleoEmpresario()/100;
-                formacionEmpresario = calculoBase * datosCuotas.getFormacionEmpresario()/100;
-                accidentesEmpresario = calculoBase * datosCuotas.getAccidentesTrabajoEmpresario()/100;
-                fogasaEmpresario = calculoBase * datosCuotas.getFogasaEmpresario()/100;
+                double[] cuotasCalculadas = datosCuotas.datosCuotas();
+                for (int i = 0; i < 8; i++) {
+                    cuotasCalculadas[i] *= calculoBase / 100;
+                }
+                double totalTrabajador = irpf;
+                double totalEmpleador = 0;
+                for (int i = 0; i < 3; i++) {
+                    totalTrabajador += cuotasCalculadas[i];
+                }
+                for (int i = 3; i < 8; i++) {
+                    totalEmpleador += cuotasCalculadas[i];
+                }
+                
                 // --- IMPRIMIR ---
-
-                System.out.println("DNI: "+ str.getDni() + "\n");
-
-                System.out.println("Salario Base: "+ salarioBase);
-                System.out.println("Prorrateo: "+ cantidadProrrateo);            
-                System.out.println("Complemento: "+ bruto[1]/14);
-                System.out.println("Antiguedad: "+ trienio+ "\n");
+                imprimeNominas(str, cuotasCalculadas, bruto, calculoBase, fecha, salarioBase,
+                        cantidadProrrateo,anos, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
                 
-                System.out.println("Contingencias generales: " + contingencias);
-                System.out.println("Desempleo: " + desempleo);
-                System.out.println("Cuota formación: " + formacion);
-                System.out.println("IRPF: "+ irpf + "\n");
-
-                //Total deducciones, total devengos, Liquido a percibir
-                
-                System.out.println("Calculo empresario BASE: "+ calculoBase);
-                
-                System.out.println("Contingencias comunes empresario: "+ contingenciasEmpresario);
-                System.out.println("Desempleo: "+ desempleoEmpresario);
-                System.out.println("Formación: "+ formacionEmpresario);
-                System.out.println("Accidentes de trabajo: "+ accidentesEmpresario);
-                System.out.println("FOGASA: "+ fogasaEmpresario+"\n");
-                
-                System.out.println("Total empresario: " + "\n");
-                
-                System.out.println("COSTE TOTAL TRABAJADOR: ");
-                System.out.println("-------------------------------------------------");
-                //System.out.println("Tramo IRPF: "+tramo_irpf);
-                //System.out.println("Porcentaje IRPF: "+ porcentajeIRPF);
-                //System.out.println("Bruto Anual: "+brutoAnual);
             }
         }
     }
 
-    public static void calculoTrienio(EmpleadoWorbu emp, int mes, int ano) {
+    public static boolean cambioTrienio(LocalDate fecha, LocalDate alta) {
+//        false   - no hay cambio de trienio
+//        true    - hay cambio de trienio
+//        if (mes>5){//miramos diferencia de tiempo entre alta y dic año pasado
+//            
+//        }
+            
+        return false;
+    }
+    public static void imprimeNominas(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
+            double calculoBase, String fecha, double salarioBase, double cantidadProrrateo,
+            int anos, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador){
+        System.out.printf("Empresa: %s\n", str.getNombreEmpresa());
+                System.out.printf("CIF: %s\n", str.getCifEmpresa());
+                System.out.println("-------------------------------------------------");
+                
+                System.out.printf("Nombre: %s\n", str.getNombre());
+                System.out.printf("Apellidos: %s %s\n", str.getApellido1(), str.getApellido2());
+                System.out.printf("DNI: %s\n", str.getDni());
+                System.out.printf("Fecha de alta: %s\n", str.getFechaAltaEmpresa());
+                System.out.printf("Categoria: %s\n", str.getCategoria());
+                System.out.printf("Bruto Anual: %.2f€\n", bruto[0]); 
+                System.out.printf("IBAN: %s\n", str.getIban());
 
+                System.out.printf("Fecha nomina: %s\n", fecha);
+                
+                System.out.printf("Salario Base: %.2f\n", salarioBase);
+                System.out.printf("Prorrateo: %.2f\n", cantidadProrrateo);            
+                System.out.printf("Complemento: %.2f\n", bruto[1]/14);
+                System.out.printf("Antiguedad: %d años\n", anos);
+                System.out.println("-------------------------------------------------");
+
+                //Total deducciones, total devengos, Liquido a percibir
+                System.out.printf("DESCUENTO TRABAJADOR: \n");
+                System.out.printf("Contingencias generales: %.2f%% de %.2f = %.2f€\n" ,datosCuotas.getCuotaObreraGeneralTrabajador(), calculoBase, cuotasCalculadas[0]);
+                System.out.printf("Desempleo: %.2f%% de %.2f = %.2f€\n" ,datosCuotas.getCuotaDesempleoTrabajador(), calculoBase, cuotasCalculadas[1]);
+                System.out.printf("Cuota formación: %.2f%% de %.2f = %.2f€\n" ,datosCuotas.getCuotaFormacionTrabajador(), calculoBase, cuotasCalculadas[2]);
+                System.out.printf("IRPF: %.2f%% de %.2f = %.2f€\n" ,porcentajeIRPF, calculoBase, irpf);
+                System.out.printf("Total ingresos trabajador: %.2f€\n", calculoBase);
+                System.out.printf("Total deducciones trabajador: %.2f€\n", totalTrabajador);
+                System.out.printf("Liquido trabajador: %.2f€\n", calculoBase - totalTrabajador);
+                System.out.println("-------------------------------------------------");
+                
+                System.out.printf("EMPRESARIO BASE: %.2f€\n" , calculoBase);
+                
+                System.out.printf("Contingencias comunes empresario: %.2f%% = %.2f€\n", datosCuotas.getContingenciasComunesEmpresario(), cuotasCalculadas[3]);
+                System.out.printf("FOGASA: %.2f%% = %.2f€\n", datosCuotas.getFogasaEmpresario(), cuotasCalculadas[7]);
+                System.out.printf("Desempleo: %.2f%% = %.2f€\n", datosCuotas.getDesmpleoEmpresario(), cuotasCalculadas[4]);
+                System.out.printf("Formación: %.2f%% = %.2f€\n", datosCuotas.getFormacionEmpresario(), cuotasCalculadas[5]);
+                System.out.printf("Accidentes de trabajo: %.2f%% = %.2f€\n", datosCuotas.getAccidentesTrabajoEmpresario(), cuotasCalculadas[6]);
+                System.out.printf("Pagos empresario: %.2f€\n", totalEmpleador);
+                System.out.printf("Total empresario: %.2f€\n", totalEmpleador + calculoBase);
+                System.out.println("-------------------------------------------------");
     }
 }
