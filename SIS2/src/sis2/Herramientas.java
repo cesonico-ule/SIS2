@@ -51,7 +51,7 @@ public class Herramientas {
         int resultSegun = bucleNum(segun);
         
         if(resultPrimer != checkPrimer || resultSegun != checkSegun){
-            System.out.println("El codigo de cuenta NO es correcto. Se procede a corregirlo.\n");
+            System.out.println("El codigo de cuenta NO es correcto. Se procede a corregirlo.");
             //---Primeros 8 digitos---
             String nuevoCodigo = numCuenta.substring(0, 8);
             
@@ -65,7 +65,7 @@ public class Herramientas {
             
             return nuevoCodigo;
         } else {
-            System.out.println("El codigo de cuenta es correcto.\n");
+            System.out.println("El codigo de cuenta es correcto.");
             return numCuenta;
         }
     }
@@ -87,7 +87,7 @@ public class Herramientas {
         double auxDou=Double.parseDouble(IBANcalc);
         
 	long auxInt1=(long) (auxDou%97);
-        System.out.println(auxInt1);
+        //System.out.println(auxInt1);
 	auxInt1=98-auxInt1;
                 
         String checkNums;

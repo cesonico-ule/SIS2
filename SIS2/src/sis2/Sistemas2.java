@@ -51,10 +51,10 @@ public class Sistemas2 {
 ___________________Fin obtencion de datos___________________
 */
 
-//        compruebaDNIs();
-//        compruebaIBANs();
-//        creaEMAILs();
-        generaNominas("12/2021");
+        compruebaDNIs();
+        compruebaIBANs();
+        creaEMAILs();
+//        generaNominas("12/2021");
         
         
 /*      boolean salir = false;
@@ -199,8 +199,9 @@ ___________________Fin obtencion de datos___________________
                     correo += "00@";
 
                 } else { //ya hay correos iguales
-                    correo += String.format("%02d", lista.get(correo)) + "@";
                     lista.put(correo, lista.get(correo) + 1);
+                    correo += String.format("%02d", lista.get(correo)-1) + "@";
+                    
                 }
                 correo += str.getNombreEmpresa() + ".com";
                 System.out.println(correo);
@@ -393,49 +394,50 @@ ___________________Fin obtencion de datos___________________
             
         return false;
     }
+    
     public static void imprimeNominas(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
             double calculoBase, String fecha, double salarioBase, double cantidadProrrateo,
-            int anos, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador){
+            int anos, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
         System.out.printf("Empresa: %s\n", str.getNombreEmpresa());
-                System.out.printf("CIF: %s\n", str.getCifEmpresa());
-                System.out.println("-------------------------------------------------");
-                
-                System.out.printf("Nombre: %s\n", str.getNombre());
-                System.out.printf("Apellidos: %s %s\n", str.getApellido1(), str.getApellido2());
-                System.out.printf("DNI: %s\n", str.getDni());
-                System.out.printf("Fecha de alta: %s\n", str.getFechaAltaEmpresa());
-                System.out.printf("Categoria: %s\n", str.getCategoria());
-                System.out.printf("Bruto Anual: %.2f€\n", bruto[0]); 
-                System.out.printf("IBAN: %s\n", str.getIban());
+        System.out.printf("CIF: %s\n", str.getCifEmpresa());
+        System.out.println("-------------------------------------------------");
 
-                System.out.printf("Fecha nomina: %s\n", fecha);
-                
-                System.out.printf("Salario Base: %.2f\n", salarioBase);
-                System.out.printf("Prorrateo: %.2f\n", cantidadProrrateo);            
-                System.out.printf("Complemento: %.2f\n", bruto[1]/14);
-                System.out.printf("Antiguedad: %d años\n", anos);
-                System.out.println("-------------------------------------------------");
+        System.out.printf("Nombre: %s\n", str.getNombre());
+        System.out.printf("Apellidos: %s %s\n", str.getApellido1(), str.getApellido2());
+        System.out.printf("DNI: %s\n", str.getDni());
+        System.out.printf("Fecha de alta: %s\n", str.getFechaAltaEmpresa());
+        System.out.printf("Categoria: %s\n", str.getCategoria());
+        System.out.printf("Bruto Anual: %.2f€\n", bruto[0]);
+        System.out.printf("IBAN: %s\n", str.getIban());
 
-                //Total deducciones, total devengos, Liquido a percibir
-                System.out.printf("DESCUENTO TRABAJADOR: \n");
-                System.out.printf("Contingencias generales: %.2f%% de %.2f = %.2f€\n" ,datosCuotas.getCuotaObreraGeneralTrabajador(), calculoBase, cuotasCalculadas[0]);
-                System.out.printf("Desempleo: %.2f%% de %.2f = %.2f€\n" ,datosCuotas.getCuotaDesempleoTrabajador(), calculoBase, cuotasCalculadas[1]);
-                System.out.printf("Cuota formación: %.2f%% de %.2f = %.2f€\n" ,datosCuotas.getCuotaFormacionTrabajador(), calculoBase, cuotasCalculadas[2]);
-                System.out.printf("IRPF: %.2f%% de %.2f = %.2f€\n" ,porcentajeIRPF, calculoBase, irpf);
-                System.out.printf("Total ingresos trabajador: %.2f€\n", calculoBase);
-                System.out.printf("Total deducciones trabajador: %.2f€\n", totalTrabajador);
-                System.out.printf("Liquido trabajador: %.2f€\n", calculoBase - totalTrabajador);
-                System.out.println("-------------------------------------------------");
-                
-                System.out.printf("EMPRESARIO BASE: %.2f€\n" , calculoBase);
-                
-                System.out.printf("Contingencias comunes empresario: %.2f%% = %.2f€\n", datosCuotas.getContingenciasComunesEmpresario(), cuotasCalculadas[3]);
-                System.out.printf("FOGASA: %.2f%% = %.2f€\n", datosCuotas.getFogasaEmpresario(), cuotasCalculadas[7]);
-                System.out.printf("Desempleo: %.2f%% = %.2f€\n", datosCuotas.getDesmpleoEmpresario(), cuotasCalculadas[4]);
-                System.out.printf("Formación: %.2f%% = %.2f€\n", datosCuotas.getFormacionEmpresario(), cuotasCalculadas[5]);
-                System.out.printf("Accidentes de trabajo: %.2f%% = %.2f€\n", datosCuotas.getAccidentesTrabajoEmpresario(), cuotasCalculadas[6]);
-                System.out.printf("Pagos empresario: %.2f€\n", totalEmpleador);
-                System.out.printf("Total empresario: %.2f€\n", totalEmpleador + calculoBase);
-                System.out.println("-------------------------------------------------");
+        System.out.printf("Fecha nomina: %s\n", fecha);
+
+        System.out.printf("Salario Base: %.2f\n", salarioBase);
+        System.out.printf("Prorrateo: %.2f\n", cantidadProrrateo);
+        System.out.printf("Complemento: %.2f\n", bruto[1] / 14);
+        System.out.printf("Antiguedad: %d años\n", anos);
+        System.out.println("-------------------------------------------------");
+
+        //Total deducciones, total devengos, Liquido a percibir
+        System.out.printf("DESCUENTO TRABAJADOR: \n");
+        System.out.printf("Contingencias generales: %.2f%% de %.2f = %.2f€\n", datosCuotas.getCuotaObreraGeneralTrabajador(), calculoBase, cuotasCalculadas[0]);
+        System.out.printf("Desempleo: %.2f%% de %.2f = %.2f€\n", datosCuotas.getCuotaDesempleoTrabajador(), calculoBase, cuotasCalculadas[1]);
+        System.out.printf("Cuota formación: %.2f%% de %.2f = %.2f€\n", datosCuotas.getCuotaFormacionTrabajador(), calculoBase, cuotasCalculadas[2]);
+        System.out.printf("IRPF: %.2f%% de %.2f = %.2f€\n", porcentajeIRPF, calculoBase, irpf);
+        System.out.printf("Total ingresos trabajador: %.2f€\n", calculoBase);
+        System.out.printf("Total deducciones trabajador: %.2f€\n", totalTrabajador);
+        System.out.printf("Liquido trabajador: %.2f€\n", calculoBase - totalTrabajador);
+        System.out.println("-------------------------------------------------");
+
+        System.out.printf("EMPRESARIO BASE: %.2f€\n", calculoBase);
+
+        System.out.printf("Contingencias comunes empresario: %.2f%% = %.2f€\n", datosCuotas.getContingenciasComunesEmpresario(), cuotasCalculadas[3]);
+        System.out.printf("FOGASA: %.2f%% = %.2f€\n", datosCuotas.getFogasaEmpresario(), cuotasCalculadas[7]);
+        System.out.printf("Desempleo: %.2f%% = %.2f€\n", datosCuotas.getDesmpleoEmpresario(), cuotasCalculadas[4]);
+        System.out.printf("Formación: %.2f%% = %.2f€\n", datosCuotas.getFormacionEmpresario(), cuotasCalculadas[5]);
+        System.out.printf("Accidentes de trabajo: %.2f%% = %.2f€\n", datosCuotas.getAccidentesTrabajoEmpresario(), cuotasCalculadas[6]);
+        System.out.printf("Pagos empresario: %.2f€\n", totalEmpleador);
+        System.out.printf("Total empresario: %.2f€\n", totalEmpleador + calculoBase);
+        System.out.println("-------------------------------------------------");
     }
 }
