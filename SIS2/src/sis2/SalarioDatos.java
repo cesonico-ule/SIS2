@@ -7,15 +7,15 @@ package sistemas2;
  */
 public class SalarioDatos {
     
-    public double cuotaObreraGeneralTrabajador;
-    public double cuotaDesempleoTrabajador;
-    public double cuotaFormacionTrabajador;
+    private double cuotaObreraGeneralTrabajador;
+    private double cuotaDesempleoTrabajador;
+    private double cuotaFormacionTrabajador;
     
-    public double contingenciasComunesEmpresario;
-    public double fogasaEmpresario;
-    public double desempleoEmpresario;
-    public double formacionEmpresario;
-    public double accidentesTrabajoEmpresario;
+    private double contingenciasComunesEmpresario;
+    private double fogasaEmpresario;
+    private double desempleoEmpresario;
+    private double formacionEmpresario;
+    private double accidentesTrabajoEmpresario;
 
     public SalarioDatos(double[] datos){
         cuotaObreraGeneralTrabajador = datos[0];

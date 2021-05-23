@@ -160,7 +160,7 @@ public class ManejadorExcel {
 	XSSFSheet sheet = workbook.getSheetAt(0);
         
         for (int i=1; i<19; i++){//recorre las 18 primeras filas
-            double trienio = sheet.getRow(i).getCell(5).getNumericCellValue();//Nombre categoria
+            //double trienio = sheet.getRow(i).getCell(5).getNumericCellValue();//Nombre categoria
             //System.out.println("Trienio: " + trienio);
             Integer  valor = (int) sheet.getRow(i).getCell(6).getNumericCellValue(); //Valor salario
             //System.out.println("Valor: " + valor);

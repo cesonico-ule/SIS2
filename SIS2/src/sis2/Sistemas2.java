@@ -1,13 +1,16 @@
 package sistemas2;
 
 import Modelo.*;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -52,12 +55,13 @@ public class Sistemas2 {
 ___________________Fin obtencion de datos___________________
          */
 
-//        compruebaDNIs();
-//        compruebaIBANs();
-//        creaEMAILs();
-        generaNominas("12/2021");
+//        Practica 3 - Ejecucion para la entrega
+        compruebaDNIs();
+        compruebaIBANs();
+        creaEMAILs();
+        generaNominas("12/2021", true);
 
-        /*      boolean salir = false;
+        boolean salir = false;
         Scanner sc = new Scanner(System.in);
         while (!salir) {
             System.out.println(
@@ -66,7 +70,8 @@ ___________________Fin obtencion de datos___________________
                     + "2. Comprobar y generar las cuentas bancarias\n"
                     + "3. Generar los emails\n"
                     + "4. Tarea completa\n"
-                    + "5. Generar nominas"
+                    + "5. Generar nominas por pantalla"
+                    + "5. Generar nominas en archivos"
                     + "\n0. Salir\n");
 
             switch (sc.next()) {
@@ -99,23 +104,19 @@ ___________________Fin obtencion de datos___________________
 
                 case "5":
                     System.out.println("*** Introduzca el mes y año de la nomina a calcular ***");
-                    String[] parts = sc.next().split("/"); //parts[0]=mes parts[1]=año
+                    generaNominas(sc.next(), false);
+                    break;
 
-                    if (parts[0].equals("06") || parts[0].equals("12")) {
-                        //Se generan tambien las nominas de la extra para aquellos que no este prorrateada
-
-                    } else {
-                        //Default
-
-                    }
+                case "6":
+                    System.out.println("*** Introduzca el mes y año de la nomina a calcular ***");
+                    generaNominas(sc.next(), true);
                     break;
                 case "9":
                     System.out.println("Prueba");
-                    generaNominas("01/2001");
+                    generaNominas("12/2021", false);
                     break;
             }
         }
-         */
     }
 
     public static void compruebaDNIs() {
@@ -305,49 +306,35 @@ ___________________Fin obtencion de datos___________________
 
     }
 
-    public static void generaNominas(String fecha) {
-        double calculoBase;
-        double brutoAnual;
-        double brutoMes;
-        double[] bruto;
-        double irpf;
-        double calculoirpf;
-        double cantidadProrrateo;
-        double salarioBase;
-        int trienio;
+    public static void generaNominas(String fecha, boolean archivo) {
+        
+        double calculoBase, brutoAnual, brutoMes;
+        double[] bruto;double[] cuotasCalculadas;double[] cuotas0;
+        double irpf, calculoirpf, porcentajeIRPF;
+        double cantidadProrrateo,salarioBase;
+        int trienio, anos, meses, anos_enero, anos_dic;
         boolean cambio_trienio = false;
         String[] parte = fecha.split("/");
-
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+        LocalDate fech = LocalDate.parse("01/" + fecha, formato);
+        LocalDate enero = LocalDate.parse("01/01/" + parte[1], formato);
+        LocalDate dic = LocalDate.parse("01/12/" + parte[1], formato);
+        
         for (EmpleadoWorbu str : empleados) {
 
-            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/uuuu");
             LocalDate alta = LocalDate.parse(str.getFechaAltaEmpresa(), formato);
-            LocalDate fech = LocalDate.parse("01/" + fecha, formato);
-            LocalDate enero = LocalDate.parse("01/01/" + parte[1], formato);
-            LocalDate dic = LocalDate.parse("01/12/" + parte[1], formato);
 
-            int anos = (int) ChronoUnit.YEARS.between(alta, fech);//antiguedad a dia de nomina
-            int meses = (int) ChronoUnit.MONTHS.between(alta, fech);//antiguedad a dia de nomina
-            int anos_enero = (int) ChronoUnit.YEARS.between(alta, enero);
-            int anos_dic = (int) ChronoUnit.YEARS.between(alta, dic);
+            anos = (int) ChronoUnit.YEARS.between(alta, fech);//antiguedad a dia de nomina
+            meses = (int) ChronoUnit.MONTHS.between(alta, fech);//antiguedad a dia de nomina
+            anos_enero = (int) ChronoUnit.YEARS.between(alta, enero);
+            anos_dic = (int) ChronoUnit.YEARS.between(alta, dic);
             if (anos_enero != anos_dic) {
                 cambio_trienio = true;
             }
 
             bruto = categorias.get(str.getCategoria());
             brutoAnual = bruto[0] + bruto[1]; //sin antiguedad ni prorrateo
-/*
-            if (anos<1){
-                if (meses>5) meses++;
-                
-                irpf_p = (brutoAnual/12)*meses;
-                irpf_s = (brutoAnual/14*meses) + (brutoAnual/14)*((meses-6)/6);
-                
-            }
-             */
-
             trienio = trienios.get(anos / 3);
-
             brutoMes = bruto[0] / 14 + bruto[1] / 14 + trienio;
             cantidadProrrateo = brutoMes / 6;
             calculoBase = brutoMes + cantidadProrrateo;
@@ -364,7 +351,7 @@ ___________________Fin obtencion de datos___________________
 //                    brutoMes = brutoAnual/12;
 //                    if (meses>5) meses++;
 //                    brutoMes *= meses;
-                    
+
                 } else {
                     meses = 12 - alta.getMonthValue();
                     if (meses > 5) {
@@ -379,7 +366,7 @@ ___________________Fin obtencion de datos___________________
                     }
                 }
             }
-            double porcentajeIRPF = brutoExcel.get(brutoExcel.ceilingKey(calculoirpf));
+            porcentajeIRPF = brutoExcel.get(brutoExcel.ceilingKey(calculoirpf));
             salarioBase = bruto[0] / 14;
             if (str.isProrrata()) {
                 irpf = calculoBase * porcentajeIRPF / 100;
@@ -391,13 +378,13 @@ ___________________Fin obtencion de datos___________________
                 //salarioBase = (bruto[0] - cantidadProrrateo) / 14;
                 cantidadProrrateo = 0;
                 //irpf se hace sobre salarioBase
-
             }
-            double[] cuotasCalculadas = datosCuotas.datosCuotas();
-            double[] cuotas0 = datosCuotas.datosCuotas();
+            
+            cuotasCalculadas = datosCuotas.datosCuotas();
+            cuotas0 = datosCuotas.datosCuotas();
             for (int i = 0; i < 8; i++) {
                 cuotasCalculadas[i] *= calculoBase / 100;
-                cuotas0[i]= 0.0;
+                cuotas0[i] = 0.0;
             }
             double totalTrabajador = irpf;
             double totalEmpleador = 0;
@@ -407,29 +394,40 @@ ___________________Fin obtencion de datos___________________
             for (int i = 3; i < 8; i++) {
                 totalEmpleador += cuotasCalculadas[i];
             }
-            if (anos==0){
-                
-            }
-            // --- IMPRIMIR --- //
-            imprimeNominas(str, cuotasCalculadas, bruto, calculoBase, fecha, salarioBase, brutoMes,
-                    cantidadProrrateo, anos, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
-            
-            if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()){
-                System.out.println("\n********************EXTRA********************");
-                imprimeNominas(str, cuotas0, bruto, 0.0, fecha, salarioBase, brutoMes,
-                    cantidadProrrateo, anos, porcentajeIRPF, irpf, irpf, 0.0);
-                System.out.println("\n****************FIN_EXTRA********************\n");
+            if (anos == 0) {
 
             }
-            System.out.println("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+            // --- IMPRIMIR --- //
+            if (archivo) {
+                imprimirArchivo(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+                        cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
+
+                if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
+                    imprimirArchivo(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
+                            cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
+                }
+            } else {
+                imprimeNominas(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+                        cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
+
+                if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
+                    imprimeNominas(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
+                            cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
+                }
+            }
         }
     }
 
     public static void imprimeNominas(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
-            double calculoBase, String fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
-            int anos, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
-        
-        System.out.printf("NOMINA de: %s\n", fecha);
+            double calculoBase, LocalDate fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
+            int anos, int trienio, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
+
+        Locale SPAIN = new Locale("es", "ES");
+        if (calculoBase == 0.0) {
+            System.out.println("\n********************EXTRA********************");
+        }
+
+        System.out.printf(String.format("NOMINA de: %s - %s\n", fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).toUpperCase(), fecha.getYear()));
 
         System.out.printf("Empresa: %s\n", str.getNombreEmpresa());
         System.out.printf("CIF: %s\n", str.getCifEmpresa());
@@ -443,10 +441,10 @@ ___________________Fin obtencion de datos___________________
         System.out.printf("Bruto Anual: %.2f€\n", bruto[0]);
         System.out.printf("IBAN: %s\n", str.getIban());
 
-
-        System.out.printf("Salario Base: %.2f\n", salarioBase);
-        System.out.printf("Prorrateo: %.2f\n", cantidadProrrateo);
-        System.out.printf("Complemento: %.2f\n", bruto[1] / 14);
+        System.out.printf("Salario Base: %.2f€\n", salarioBase);
+        System.out.printf("Prorrateo: %.2f€\n", cantidadProrrateo);
+        System.out.printf("Complemento: %.2f€\n", bruto[1] / 14);
+        System.out.printf("Trienios: %d€\n", trienio);
         System.out.printf("Antiguedad: %d años\n", anos);
         System.out.println("----------------------------------------------------");
 
@@ -471,55 +469,85 @@ ___________________Fin obtencion de datos___________________
         System.out.printf("Accidentes de trabajo: %.2f%% = %.2f€\n", datosCuotas.getAccidentesTrabajoEmpresario(), cuotasCalculadas[7]);
         System.out.printf("Pagos empresario: %.2f€\n", totalEmpleador);
         System.out.printf("Total empresario: %.2f€\n", totalEmpleador + brutoMes);
-    }
-    
-    public static void imprimeExtra(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
-            String fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
-            int anos, double porcentajeIRPF, double irpf) {
-        
-        System.out.printf("NOMINA de: %s\n", fecha);
 
-        System.out.printf("Empresa: %s\n", str.getNombreEmpresa());
-        System.out.printf("CIF: %s\n", str.getCifEmpresa());
-        System.out.println("----------------------------------------------------");
-
-        System.out.printf("Nombre: %s\n", str.getNombre());
-        System.out.printf("Apellidos: %s %s\n", str.getApellido1(), str.getApellido2());
-        System.out.printf("DNI: %s\n", str.getDni());
-        System.out.printf("Fecha de alta: %s\n", str.getFechaAltaEmpresa());
-        System.out.printf("Categoria: %s\n", str.getCategoria());
-        System.out.printf("Bruto Anual: %.2f€\n", bruto[0]);
-        System.out.printf("IBAN: %s\n", str.getIban());
-
-
-        System.out.printf("Salario Base: %.2f\n", salarioBase);
-        System.out.printf("Prorrateo: %.2f\n", cantidadProrrateo);
-        System.out.printf("Complemento: %.2f\n", bruto[1] / 14);
-        System.out.printf("Antiguedad: %d años\n", anos);
-        System.out.println("----------------------------------------------------");
-
-        //Total deducciones, total devengos, Liquido a percibir
-        System.out.printf("DESCUENTO TRABAJADOR: \n");
-
-        System.out.printf("Contingencias generales: %.2f%% de %.2f = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("Desempleo: %.2f%% de %.2f = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("Cuota formación: %.2f%% de %.2f = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("IRPF: %.2f%% de %.2f = %.2f€\n", porcentajeIRPF, brutoMes, irpf);
-        System.out.printf("Total ingresos trabajador: %.2f€\n", brutoMes);
-        System.out.printf("Total deducciones trabajador: %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("Liquido trabajador: %.2f€\n", brutoMes - irpf);
-        System.out.println("----------------------------------------------------");
-
-        System.out.printf("EMPRESARIO BASE: %.2f€\n", 0.0);
-
-        System.out.printf("Contingencias comunes empresario: %.2f%% = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("FOGASA: %.2f%% = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("Desempleo: %.2f%% = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("Formación: %.2f%% = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("Accidentes de trabajo: %.2f%% = %.2f€\n", 0.0, 0.0, 0.0);
-        System.out.printf("Pagos empresario: %.2f€\n", 0.0);
-        System.out.printf("Total empresario: %.2f€\n", brutoMes);
-        
+        if (calculoBase == 0.0) {
+            System.out.println("\n****************FIN_EXTRA********************\n");
+        }
         System.out.println("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
+
+    }
+
+    public static void imprimirArchivo(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
+            double calculoBase, LocalDate fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
+            int anos, int trienio, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
+
+        Locale SPAIN = new Locale("es", "ES");
+
+        String file = str.getDni() + str.getNombre() + str.getApellido1() + str.getApellido2()
+                + fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).toUpperCase() + fecha.getYear();
+
+        if (calculoBase == 0.0) {
+            file += "EXTRA";
+        }
+
+        try {
+
+            FileWriter myWriter = new FileWriter(String.format("resources\\nominas\\%s.txt", file));
+
+            if (calculoBase == 0.0) {
+                myWriter.write("********************EXTRA********************\n");
+            }
+
+            myWriter.write(String.format("NOMINA de: %s - %s\n", fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).toUpperCase(), fecha.getYear()));
+
+            myWriter.write(String.format("Empresa: %s\n", str.getNombreEmpresa()));
+            myWriter.write(String.format("CIF: %s\n", str.getCifEmpresa()));
+            myWriter.write("----------------------------------------------------\n");
+
+            myWriter.write(String.format("Nombre: %s\n", str.getNombre()));
+            myWriter.write(String.format("Apellidos: %s %s\n", str.getApellido1(), str.getApellido2()));
+            myWriter.write(String.format("DNI: %s\n", str.getDni()));
+            myWriter.write(String.format("Fecha de alta: %s\n", str.getFechaAltaEmpresa()));
+            myWriter.write(String.format("Categoria: %s\n", str.getCategoria()));
+            myWriter.write(String.format("Bruto Anual: %.2f€\n", bruto[0]));
+            myWriter.write(String.format("IBAN: %s\n", str.getIban()));
+
+            myWriter.write(String.format("Salario Base: %.2f€\n", salarioBase));
+            myWriter.write(String.format("Prorrateo: %.2f€\n", cantidadProrrateo));
+            myWriter.write(String.format("Complemento: %.2f€\n", bruto[1] / 14));
+            myWriter.write(String.format("Trienios: %d€\n", trienio));
+            myWriter.write(String.format("Antiguedad: %d años\n", anos));
+            
+            myWriter.write("----------------------------------------------------\n");
+
+            //Total deducciones, total devengos, Liquido a percibir
+            myWriter.write(String.format("DESCUENTO TRABAJADOR: \n"));
+
+            myWriter.write(String.format("Contingencias generales: %.2f%% de %.2f = %.2f€\n", datosCuotas.getCuotaObreraGeneralTrabajador(), calculoBase, cuotasCalculadas[0]));
+            myWriter.write(String.format("Desempleo: %.2f%% de %.2f = %.2f€\n", datosCuotas.getCuotaDesempleoTrabajador(), calculoBase, cuotasCalculadas[1]));
+            myWriter.write(String.format("Cuota formación: %.2f%% de %.2f = %.2f€\n", datosCuotas.getCuotaFormacionTrabajador(), calculoBase, cuotasCalculadas[2]));
+            myWriter.write(String.format("IRPF: %.2f%% de %.2f = %.2f€\n", porcentajeIRPF, brutoMes, irpf));
+            myWriter.write(String.format("Total ingresos trabajador: %.2f€\n", brutoMes));
+            myWriter.write(String.format("Total deducciones trabajador: %.2f€\n", totalTrabajador));
+            myWriter.write(String.format("Liquido trabajador: %.2f€\n", brutoMes - totalTrabajador));
+            myWriter.write("----------------------------------------------------\n");
+
+            myWriter.write(String.format("EMPRESARIO BASE: %.2f€\n", calculoBase));
+
+            myWriter.write(String.format("Contingencias comunes empresario: %.2f%% = %.2f€\n", datosCuotas.getContingenciasComunesEmpresario(), cuotasCalculadas[3]));
+            myWriter.write(String.format("FOGASA: %.2f%% = %.2f€\n", datosCuotas.getFogasaEmpresario(), cuotasCalculadas[4]));
+            myWriter.write(String.format("Desempleo: %.2f%% = %.2f€\n", datosCuotas.getDesmpleoEmpresario(), cuotasCalculadas[5]));
+            myWriter.write(String.format("Formación: %.2f%% = %.2f€\n", datosCuotas.getFormacionEmpresario(), cuotasCalculadas[6]));
+            myWriter.write(String.format("Accidentes de trabajo: %.2f%% = %.2f€\n", datosCuotas.getAccidentesTrabajoEmpresario(), cuotasCalculadas[7]));
+            myWriter.write(String.format("Pagos empresario: %.2f€\n", totalEmpleador));
+            myWriter.write(String.format("Total empresario: %.2f€\n", totalEmpleador + brutoMes));
+            myWriter.close();
+
+            System.out.println("Nomina guardada correctamente.");
+
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 }

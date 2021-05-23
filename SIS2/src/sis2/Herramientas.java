@@ -89,7 +89,7 @@ public class Herramientas {
         double auxDou=Double.parseDouble(IBANcalc);
         
 	long auxInt1=(long) (auxDou%97);
-        System.out.println(auxInt1);
+//        System.out.println(auxInt1);
 	auxInt1=98-auxInt1;
                 
         String checkNums;
