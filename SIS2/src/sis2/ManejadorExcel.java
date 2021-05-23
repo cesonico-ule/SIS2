@@ -23,9 +23,6 @@ import java.util.Map;
  */
 public class ManejadorExcel {
     
-    /*
-     Recibe la hoja X del archivo Y como lista de datos
-    */
     public ArrayList<EmpleadoWorbu> lecturaTrabajadores(String archivo) throws IOException{
         
         ArrayList<String[]> valoresCeldas = new ArrayList<String[]>();

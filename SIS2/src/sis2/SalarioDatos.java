@@ -10,9 +10,10 @@ public class SalarioDatos {
     public double cuotaObreraGeneralTrabajador;
     public double cuotaDesempleoTrabajador;
     public double cuotaFormacionTrabajador;
+    
     public double contingenciasComunesEmpresario;
     public double fogasaEmpresario;
-    public double desmpleoEmpresario;
+    public double desempleoEmpresario;
     public double formacionEmpresario;
     public double accidentesTrabajoEmpresario;
 
@@ -20,9 +21,10 @@ public class SalarioDatos {
         cuotaObreraGeneralTrabajador = datos[0];
         cuotaDesempleoTrabajador = datos[1];
         cuotaFormacionTrabajador = datos[2];
+        
         contingenciasComunesEmpresario = datos[3];
         fogasaEmpresario = datos[4];
-        desmpleoEmpresario = datos[5];
+        desempleoEmpresario = datos[5];
         formacionEmpresario = datos[6];
         accidentesTrabajoEmpresario = datos[7];
     }
@@ -33,7 +35,7 @@ public class SalarioDatos {
         datos[2] = cuotaFormacionTrabajador;
         datos[3] = contingenciasComunesEmpresario;
         datos[4] = fogasaEmpresario;
-        datos[5] = desmpleoEmpresario;
+        datos[5] = desempleoEmpresario;
         datos[6] = formacionEmpresario;
         datos[7] = accidentesTrabajoEmpresario;
         return datos;
@@ -60,7 +62,7 @@ public class SalarioDatos {
     }
 
     public double getDesmpleoEmpresario() {
-        return desmpleoEmpresario;
+        return desempleoEmpresario;
     }
 
     public double getFormacionEmpresario() {
@@ -92,7 +94,7 @@ public class SalarioDatos {
     }
 
     public void setDesmpleoEmpresario(double desmpleoEmpresario) {
-        this.desmpleoEmpresario = desmpleoEmpresario;
+        this.desempleoEmpresario = desmpleoEmpresario;
     }
 
     public void setFormacionEmpresario(double formacionEmpresario) {

@@ -9,18 +9,21 @@ public class EmpleadoWorbu {
 
     private String nombreEmpresa;
     private String cifEmpresa;
+    
     private String categoria;
+    
     private String fechaAltaEmpresa;
     private String apellido1;
     private String apellido2;
     private String nombre;
-    private String dni;
-    private boolean prorrata;
+    private String dni;    
     private String codCuenta;
-    private String cccError;
-    private String paisCuenta;
     private String iban;
     private String email;
+    
+    private String cccError;
+    private String paisCuenta;
+    private boolean prorrata;
     private int fila;
 
     public EmpleadoWorbu(String[] datos) {
