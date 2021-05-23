@@ -15,6 +15,7 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -149,10 +150,10 @@ public class ManejadorExcel {
         
     }
     
-    public ArrayList<Double> leerTrienios(String archivo)throws IOException{
+    public ArrayList<Integer> leerTrienios(String archivo)throws IOException{
         
-        ArrayList<Double> trienios = new ArrayList<>();
-        trienios.add(0.0);
+        ArrayList<Integer> trienios = new ArrayList<>();
+        trienios.add(0);
         
         FileInputStream file = new FileInputStream(new File(archivo));
 	XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -161,7 +162,7 @@ public class ManejadorExcel {
         for (int i=1; i<19; i++){//recorre las 18 primeras filas
             double trienio = sheet.getRow(i).getCell(5).getNumericCellValue();//Nombre categoria
             //System.out.println("Trienio: " + trienio);
-            double valor = sheet.getRow(i).getCell(6).getNumericCellValue(); //Valor salario
+            Integer  valor = (int) sheet.getRow(i).getCell(6).getNumericCellValue(); //Valor salario
             //System.out.println("Valor: " + valor);
             
             trienios.add(valor);
@@ -171,9 +172,9 @@ public class ManejadorExcel {
         return trienios;
     }
     
-    public Map<Double, Double> leerBruto(String archivo)throws IOException{
+    public TreeMap<Double, Double> leerBruto(String archivo)throws IOException{
         
-        Map<Double, Double> trienios = new HashMap<>();
+        TreeMap<Double, Double> trienios = new TreeMap<>() ;
                 
         FileInputStream file = new FileInputStream(new File(archivo));
 	XSSFWorkbook workbook = new XSSFWorkbook(file);
