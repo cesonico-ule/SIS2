@@ -360,16 +360,22 @@ ___________________Fin obtencion de datos___________________
 
             } else {//recien contratado
                 if (str.isProrrata()) {
-                    calculoirpf = (bruto[0] + bruto[1]) / 12 * meses;
+                    calculoirpf = brutoAnual / 12 * meses;
+//                    brutoMes = brutoAnual/12;
+//                    if (meses>5) meses++;
+//                    brutoMes *= meses;
+                    
                 } else {
                     meses = 12 - alta.getMonthValue();
                     if (meses > 5) {
                         meses++;
                     }
 
-                    calculoirpf = (bruto[0] + bruto[1]) / 14 * meses;
+                    calculoirpf = brutoAnual / 14 * meses;
+//                    brutoMes = brutoAnual/14*meses;
                     if (meses - 6 > 0) {
-                        calculoirpf += (bruto[0] + bruto[1]) / 14 * ((meses - 6) / 6);
+                        calculoirpf += brutoAnual / 14 * ((meses - 6) / 6);
+//                        brutoMes += brutoAnual / 14 * ((meses - 6) / 6);;
                     }
                 }
             }
@@ -401,16 +407,18 @@ ___________________Fin obtencion de datos___________________
             for (int i = 3; i < 8; i++) {
                 totalEmpleador += cuotasCalculadas[i];
             }
-
+            if (anos==0){
+                
+            }
             // --- IMPRIMIR --- //
             imprimeNominas(str, cuotasCalculadas, bruto, calculoBase, fecha, salarioBase, brutoMes,
                     cantidadProrrateo, anos, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
             
             if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()){
-                System.out.println("\n***************************EXTRA*******************************");
+                System.out.println("\n********************EXTRA********************");
                 imprimeNominas(str, cuotas0, bruto, 0.0, fecha, salarioBase, brutoMes,
                     cantidadProrrateo, anos, porcentajeIRPF, irpf, irpf, 0.0);
-                System.out.println("\n*************************FIN_EXTRA*****************************\n");
+                System.out.println("\n****************FIN_EXTRA********************\n");
 
             }
             System.out.println("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
@@ -464,6 +472,7 @@ ___________________Fin obtencion de datos___________________
         System.out.printf("Pagos empresario: %.2f€\n", totalEmpleador);
         System.out.printf("Total empresario: %.2f€\n", totalEmpleador + brutoMes);
     }
+    
     public static void imprimeExtra(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
             String fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
             int anos, double porcentajeIRPF, double irpf) {
