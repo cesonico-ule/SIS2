@@ -51,8 +51,7 @@ public class Herramientas {
         int resultSegun = bucleNum(segun);
         
         if(resultPrimer != checkPrimer || resultSegun != checkSegun){
-            
-            System.out.printf("El codigo de cuenta '%s' NO es correcto. Se procede a corregirlo.\n", numCuenta);
+            System.out.println("El codigo de cuenta NO es correcto. Se procede a corregirlo.\n");
             //---Primeros 8 digitos---
             String nuevoCodigo = numCuenta.substring(0, 8);
             
@@ -66,7 +65,7 @@ public class Herramientas {
             
             return nuevoCodigo;
         } else {
-            System.out.println("El codigo de cuenta es correcto.");
+            System.out.println("El codigo de cuenta es correcto.\n");
             return numCuenta;
         }
     }
@@ -77,7 +76,9 @@ public class Herramientas {
         IBANcalc += numCuenta;
         
         //---Al final se incluyen las letras del pais con su valor en char sumado a 10 para que la A valga 10---
-        IBANcalc += (pais.charAt(0)-'A'+10) + (pais.charAt(1)-'A'+10) + "00";
+        IBANcalc += Integer.toString((int)pais.charAt(0) - (int)'A' + 10);
+        IBANcalc += Integer.toString((int)pais.charAt(1) - (int)'A' + 10);
+        IBANcalc += "00";
         
         //---Sacamos el resto de dividir por 97 y obtenemos la diferencia entre ese y 98---
         double resto = calculateModulus97(IBANcalc);
@@ -88,7 +89,7 @@ public class Herramientas {
         double auxDou=Double.parseDouble(IBANcalc);
         
 	long auxInt1=(long) (auxDou%97);
-        //System.out.println(auxInt1);
+        System.out.println(auxInt1);
 	auxInt1=98-auxInt1;
                 
         String checkNums;
