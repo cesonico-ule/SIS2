@@ -39,7 +39,7 @@ public class Sistemas2 {
          */
         try {
             //Lectura excel
-            datosTrabajadores = manejador.lecturaTrabajadores(fichero);
+            empleados = manejador.lecturaTrabajadores(fichero);
             categorias = manejador.leerCategorias(fichero);
             trienios = manejador.leerTrienios(fichero);
             brutoExcel = manejador.leerBruto(fichero);
@@ -47,14 +47,9 @@ public class Sistemas2 {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        for (String[] datos : datosTrabajadores) {
-            EmpleadoWorbu aux = new EmpleadoWorbu(datos);
-            empleados.add(aux);
-        }
-        /*
-___________________Fin obtencion de ___________________
-         */
+/*
+___________________Fin obtencion de datos___________________
+*/
 
 //        compruebaDNIs();
 //        compruebaIBANs();

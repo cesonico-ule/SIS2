@@ -26,7 +26,7 @@ public class ManejadorExcel {
     /*
      Recibe la hoja X del archivo Y como lista de datos
     */
-    public ArrayList<String[]> lecturaTrabajadores(String archivo) throws IOException{
+    public ArrayList<EmpleadoWorbu> lecturaTrabajadores(String archivo) throws IOException{
         
         ArrayList<String[]> valoresCeldas = new ArrayList<String[]>();
         String[] valoresFilas = new String[14]; //hay 13 campos en la hoja el 14 es la fila
@@ -49,7 +49,7 @@ public class ManejadorExcel {
                             Date date = celda.getDateCellValue();
                             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                             String fecha = formatter.format(date);
-                            System.out.println(fecha);
+                            //System.out.println(fecha);
                                                         
                             valoresFilas[celda.getColumnIndex()] = fecha;
 
@@ -69,7 +69,12 @@ public class ManejadorExcel {
             }
         }
         workbook.close();
-        return valoresCeldas;
+        ArrayList<EmpleadoWorbu> empleados = new ArrayList<>();
+        for (String[] datos : valoresCeldas) {
+            EmpleadoWorbu aux = new EmpleadoWorbu(datos);
+            empleados.add(aux);
+        }
+        return empleados;
     }
     
     private static boolean isRowEmpty(Row row) {
