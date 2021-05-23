@@ -51,7 +51,8 @@ public class Herramientas {
         int resultSegun = bucleNum(segun);
         
         if(resultPrimer != checkPrimer || resultSegun != checkSegun){
-            System.out.println("El codigo de cuenta NO es correcto. Se procede a corregirlo.");
+            
+            System.out.printf("El codigo de cuenta '%s' NO es correcto. Se procede a corregirlo.\n", numCuenta);
             //---Primeros 8 digitos---
             String nuevoCodigo = numCuenta.substring(0, 8);
             

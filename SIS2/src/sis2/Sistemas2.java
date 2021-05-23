@@ -129,14 +129,14 @@ ___________________Fin obtencion de datos___________________
 
             } else {
                 char letra = Herramientas.calculoDNI(str.getDni());
-                System.out.println("DNI leido: " + str.getDni().substring(0, 7));
+                System.out.println("DNI leido: " + str.getDni().substring(0, 8));
 
-                if (lista.contains(str.getDni())) {//DNI ya procesado - error
+                if (lista.contains(str.getDni().substring(0, 8))) {//DNI ya procesado - error
                     System.out.println("DNI ya procesado - Error");
                     errorEmp.add(str);
 
                 } else {//entramos cuando hay que procesar el DNI
-                    lista.add(str.getDni().substring(0, 7));
+                    lista.add(str.getDni().substring(0, 8));
                     if (letra != str.getDni().charAt(8)) {//letra no coincide
                         System.out.println("Actualizando DNI");
                         ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 7, str.getDni().replace(str.getDni().charAt(8), letra));
