@@ -51,26 +51,24 @@ public class Sistemas2 {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        /*
-___________________Fin obtencion de datos___________________
-         */
+//      ___________________Fin obtencion de datos___________________
 
 //        Practica 3 - Ejecucion para la entrega
-        compruebaDNIs();
-        compruebaIBANs();
-        creaEMAILs();
-        generaNominas("12/2021", true);
+//        compruebaDNIs(); //ahora borra de la lista los que tienen errores (blanco o repetido)
+//        compruebaIBANs();
+//        creaEMAILs();
+//        generaNominas("12/2021", true);
 
         boolean salir = false;
         Scanner sc = new Scanner(System.in);
         while (!salir) {
             System.out.println(
-                    "¿Que desea hacer?\n"
+                    "\n¿Que desea hacer?\n"
                     + "1. Comprobar los DNIs\n"
                     + "2. Comprobar y generar las cuentas bancarias\n"
                     + "3. Generar los emails\n"
                     + "4. Tarea completa\n"
-                    + "5. Generar nominas por pantalla"
+                    + "5. Generar nominas por pantalla\n"
                     + "5. Generar nominas en archivos"
                     + "\n0. Salir\n");
 
@@ -144,9 +142,15 @@ ___________________Fin obtencion de datos___________________
                     }
                     //DNI correcto - no hacer nada
                 }
+                
             }
+            
+            
         }
-        Errores.generaErrorDNI(errorEmp);
+        for (EmpleadoWorbu str : errorEmp){
+            empleados.remove(str);
+        }
+        if (!errorEmp.isEmpty()) Errores.generaErrorDNI(errorEmp);
     }
 
     public static void compruebaIBANs() {
@@ -167,7 +171,7 @@ ___________________Fin obtencion de datos___________________
                 ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 11, iban);
             }
         }
-        Errores.generaErrorCCC(errorEmp);
+        if (!errorEmp.isEmpty()) Errores.generaErrorCCC(errorEmp);
     }
 
     public static void creaEMAILs() {
@@ -492,7 +496,7 @@ ___________________Fin obtencion de datos___________________
 
         try {
 
-            FileWriter myWriter = new FileWriter(String.format("resources\\nominas\\%s.txt", file));
+            FileWriter myWriter = new FileWriter(String.format("resources\\nominasTxt\\%s.txt", file));
 
             if (calculoBase == 0.0) {
                 myWriter.write("********************EXTRA********************\n");
@@ -550,4 +554,6 @@ ___________________Fin obtencion de datos___________________
             e.printStackTrace();
         }
     }
+    
+    
 }

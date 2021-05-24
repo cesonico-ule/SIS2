@@ -6,6 +6,7 @@ package sistemas2;
  * @author Bermejo Fernandez Cesar
  */
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,14 +20,15 @@ import org.jdom2.output.XMLOutputter;
 public class Errores {
  
     public static void generaErrorDNI(ArrayList<EmpleadoWorbu> empList){
-        String fileName = "resources\\ErroresDNI.xml";
+        String fileName = "resources\\ErroresDNI";
+        String extension = ".xml";
         Document doc = new Document();
         
         doc.setRootElement(new Element("Trabajadores"));
         for(EmpleadoWorbu emp : empList){
             Element employee = new Element("Trabajador");
             employee.setAttribute("id",""+emp.getFila());
-            employee.addContent(new Element("Nombre").setText(""+emp.getNombre()));
+            employee.addContent(new Element("Nombre").setText(emp.getNombre()));
             employee.addContent(new Element("PrimerApellido").setText(emp.getApellido1()));
             employee.addContent(new Element("SegundoApellido").setText(emp.getApellido2()));
             employee.addContent(new Element("Empresa").setText(emp.getNombreEmpresa()));
@@ -39,7 +41,9 @@ public class Errores {
         //output xml to console for debugging
         //xmlOutputter.output(doc, System.out);
         try{
-            xmlOutputter.output(doc, new FileOutputStream(fileName));
+            File f = new File(fileName+extension);
+            if (f.exists()) fileName+="(1)";
+            xmlOutputter.output(doc, new FileOutputStream(fileName+extension));
         }
         catch (FileNotFoundException e){
             System.out.println("Archivo no encontrado");
@@ -53,14 +57,16 @@ public class Errores {
    
     public static void generaErrorCCC(ArrayList<EmpleadoWorbu> empList){
         //Crear metodo comun para no repetir codigo
-        String fileName = "resources\\ErroresCCC.xml";
+        String fileName = "resources\\ErroresCCC";        
+        String extension = ".xml";
+
         Document doc = new Document();
         
         doc.setRootElement(new Element("Cuentas"));
         for(EmpleadoWorbu emp : empList){
             Element employee = new Element("Cuenta");
             employee.setAttribute("id",""+emp.getFila());
-            employee.addContent(new Element("Nombre").setText(""+emp.getNombre()));
+            employee.addContent(new Element("Nombre").setText(emp.getNombre()));
             employee.addContent(new Element("PrimerApellido").setText(emp.getApellido1()));
             employee.addContent(new Element("SegundoApellido").setText(emp.getApellido2()));
             employee.addContent(new Element("Empresa").setText(emp.getNombreEmpresa()));
@@ -74,7 +80,9 @@ public class Errores {
         //output xml to console for debugging
         //xmlOutputter.output(doc, System.out);
         try{
-            xmlOutputter.output(doc, new FileOutputStream(fileName));
+            File f = new File(fileName+extension);
+            if (f.exists()) fileName+="(1)";
+            xmlOutputter.output(doc, new FileOutputStream(fileName+extension));
         }
         catch (FileNotFoundException e){
             System.out.println("Archivo no encontrado");
