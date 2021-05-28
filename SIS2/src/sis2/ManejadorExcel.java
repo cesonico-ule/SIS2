@@ -1,5 +1,6 @@
 package sistemas2;
 
+import Modelo.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,7 +15,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -26,7 +29,7 @@ public class ManejadorExcel {
     
     public ArrayList<EmpleadoWorbu> lecturaTrabajadores(String archivo) throws IOException{
         
-        ArrayList<String[]> valoresCeldas = new ArrayList<String[]>();
+        ArrayList<String[]> valoresCeldas = new ArrayList<>();
         String[] valoresFilas = new String[14]; //hay 13 campos en la hoja el 14 es la fila
         
         FileInputStream file = new FileInputStream(new File(archivo));
@@ -211,5 +214,69 @@ public class ManejadorExcel {
         workbook.close();
         SalarioDatos aux = new SalarioDatos(cuotas);
         return aux;
+    }
+    
+    public Set<Trabajadorbbdd> traductor(ArrayList<EmpleadoWorbu> emp){
+        Set<Trabajadorbbdd> lista = new HashSet();
+        Trabajadorbbdd aux = null;
+        
+        Empresas auxEmp = null;
+        
+        for (EmpleadoWorbu str: emp){
+            aux = new Trabajadorbbdd();
+            aux.setNombre(str.getNombre());
+            aux.setApellido1(str.getApellido1());
+            aux.setApellido2(str.getApellido2());
+            aux.setNifnie(str.getDni());
+            aux.setEmail(str.getEmail());
+            
+            try{            
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                Date fecha = formatter.parse(str.getFechaAltaEmpresa());
+                aux.setFechaAlta(fecha);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }  
+            aux.setCodigoCuenta(str.getCodCuenta());
+            aux.setIban(str.getIban());
+            
+            aux.setProrrata(str.isProrrata());
+            aux.setFila(str.getFila());
+            aux.setCccError(str.getCCCError());
+            aux.setPaisCuenta(str.getPaisCuenta());
+            
+            auxEmp = new Empresas();
+            auxEmp.setCif(str.getCifEmpresa());
+            auxEmp.setNombre(str.getNombreEmpresa());
+            //auxEmp.setTrabajadorbbdds(aux);
+            
+            lista.add(aux);
+        }
+        return lista;
+    }    
+    
+    public Map<String, Categorias> leerCategoria(String archivo)throws IOException{
+        
+        Map<String, Categorias> categorias = new HashMap();
+        Categorias base = null;
+                
+        FileInputStream file = new FileInputStream(new File(archivo));
+	XSSFWorkbook workbook = new XSSFWorkbook(file);
+	XSSFSheet sheet = workbook.getSheetAt(0);
+        
+        for (int i=1; i<15; i++){//recorre las 14 primeras filas
+            String categoria = sheet.getRow(i).getCell(0).getStringCellValue();//Nombre categoria
+            //System.out.println("Categoria: " + categoria);
+            double salario = sheet.getRow(i).getCell(1).getNumericCellValue(); //Valor salario
+            //System.out.println("Salario: "+salario);
+            double complemento = sheet.getRow(i).getCell(2).getNumericCellValue(); //Valor complemento
+            //System.out.println("Comp: "+complemento);
+           
+            base = new Categorias(categoria,salario,complemento);
+            categorias.put(categoria,base);            
+        }
+        workbook.close();
+        return categorias;
+        
     }
 }
