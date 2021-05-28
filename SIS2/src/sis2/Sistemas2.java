@@ -14,10 +14,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -42,12 +45,11 @@ public class Sistemas2 {
     static ManejadorExcel manejador = new ManejadorExcel();
     static ArrayList<String[]> datosTrabajadores = null;
     static ArrayList<EmpleadoWorbu> empleados = new ArrayList<>();
-    static Map<String, double[]> categorias = null;
     static ArrayList<Integer> trienios = null;
     static TreeMap<Double, Double> brutoExcel = null;
     static SalarioDatos datosCuotas = null;
     
-    static Map<String,Categorias> dategorias = null;
+    static Map<String,Categorias> categorias = null;
     static Map<String,Empresas> empres = new HashMap<>(1);
     static Set<Trabajadorbbdd> trabajadores = null;
     
@@ -91,8 +93,8 @@ public class Sistemas2 {
             }
             
             //Añadir trabajador a la categoria correcta
-            if (dategorias.get(str.getCategoria()) != null) {//control de errores
-                Categorias a = dategorias.get(str.getCategoria());
+            if (categorias.get(str.getCategoria()) != null) {//control de errores
+                Categorias a = categorias.get(str.getCategoria());
                 Set b = a.getTrabajadorbbdds();
                 aux.setCategorias(a);
                 b.add(aux);
@@ -130,25 +132,28 @@ public class Sistemas2 {
         try {
             //Lectura excel
             empleados = manejador.lecturaTrabajadores(fichero);
-            categorias = manejador.leerCategorias(fichero);
             trienios = manejador.leerTrienios(fichero);
             brutoExcel = manejador.leerBruto(fichero);
             datosCuotas = manejador.leerCuotas(fichero);
+            //Creamos las categorias
+            categorias = manejador.leerCategoria(fichero);
             
-            //creamos empresas y categorias
-            empres = traductorEmpresas(empleados);
-            dategorias = manejador.leerCategoria(fichero);
-            //creamos trabajadores y los enlazamos a las empresas y categorias
-            trabajadores = traductor(empleados);
         } catch (IOException e) {
             e.printStackTrace();
         }
+                    
 //      ___________________Fin obtencion de datos___________________
 
 //        Practica 3 - Ejecucion para la entrega
-//        compruebaDNIs(); //ahora borra de la lista los que tienen errores (blanco o repetido)
-//        compruebaIBANs();
-//        creaEMAILs();
+        compruebaDNIs(); //ahora borra de la lista los que tienen errores (blanco o repetido)
+        compruebaIBANs();
+        creaEMAILs();
+        
+        //Creamos las empresas 
+        empres = traductorEmpresas(empleados);
+        //Creamos los trabajadores y los enlazamos a las empresas y categorias
+        trabajadores = traductor(empleados);
+
         generaNominas("12/2021", true);
 /*
         boolean salir = false;
@@ -405,20 +410,38 @@ public class Sistemas2 {
     public static void generaNominas(String fecha, boolean archivo) {
         
         double calculoBase, brutoAnual, brutoMes;
-        double[] bruto;double[] cuotasCalculadas;double[] cuotas0;
+        Categorias bruto; double[] cuotasCalculadas; double[] cuotas0;
         double irpf, calculoirpf, porcentajeIRPF;
         double cantidadProrrateo,salarioBase;
         int trienio, anos, meses, anos_enero, anos_dic;
         boolean cambio_trienio = false;
         String[] parte = fecha.split("/");
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/uuuu");
-        LocalDate fech = LocalDate.parse("01/" + fecha, formato);
-        LocalDate enero = LocalDate.parse("01/01/" + parte[1], formato);
-        LocalDate dic = LocalDate.parse("01/12/" + parte[1], formato);
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("uuuu-MM-dd");
+        LocalDate fech = LocalDate.parse(parte[1] + "-" + parte[0] + "-01", formato);
+        LocalDate enero = LocalDate.parse(parte[1] + "-01-01", formato);
+        LocalDate dic = LocalDate.parse(parte[1] + "-12-01", formato);
         
-        for (EmpleadoWorbu str : empleados) {
+        for (Trabajadorbbdd str : trabajadores) {
 
-            LocalDate alta = LocalDate.parse(str.getFechaAltaEmpresa(), formato);
+            Date date = str.getFechaAlta();// the date instance
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            
+            LocalDate alta = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            
+//            System.out.println(asdasdasdads);
+//            
+//            
+//            
+//            String fechaAux = "";
+//            //fechaAux+= String.format(%2, calendar.get(Calendar.DAY_OF_MONTH));
+//            fechaAux+= "/";
+//            //fechaAux+= calendar.get(Calendar.mo);
+//            fechaAux+= "/";
+//            fechaAux+= calendar.get(Calendar.YEAR);
+//            
+//            System.out.println(fechaAux);
+//            LocalDate alta = LocalDate.parse(fechaAux, formato);
 
             anos = (int) ChronoUnit.YEARS.between(alta, fech);//antiguedad a dia de nomina
             meses = (int) ChronoUnit.MONTHS.between(alta, fech);//antiguedad a dia de nomina
@@ -428,10 +451,10 @@ public class Sistemas2 {
                 cambio_trienio = true;
             }
 
-            bruto = categorias.get(str.getCategoria());
-            brutoAnual = bruto[0] + bruto[1]; //sin antiguedad ni prorrateo
+            bruto = str.getCategorias();
+            brutoAnual = bruto.getSalarioBaseCategoria() + bruto.getComplementoCategoria(); //sin antiguedad ni prorrateo
             trienio = trienios.get(anos / 3);
-            brutoMes = bruto[0] / 14 + bruto[1] / 14 + trienio;
+            brutoMes = bruto.getSalarioBaseCategoria() / 14 + bruto.getComplementoCategoria() / 14 + trienio;
             cantidadProrrateo = brutoMes / 6;
             calculoBase = brutoMes + cantidadProrrateo;
 
@@ -463,7 +486,7 @@ public class Sistemas2 {
                 }
             }
             porcentajeIRPF = brutoExcel.get(brutoExcel.ceilingKey(calculoirpf));
-            salarioBase = bruto[0] / 14;
+            salarioBase = bruto.getSalarioBaseCategoria() / 14;
             if (str.isProrrata()) {
                 irpf = calculoBase * porcentajeIRPF / 100;
                 brutoMes = calculoBase;
@@ -495,11 +518,11 @@ public class Sistemas2 {
             }
             // --- IMPRIMIR --- //
             if (archivo) {
-                imprimirPDF(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+                imprimirArchivo(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
                         cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
 
                 if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
-                    imprimirPDF(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
+                    imprimirArchivo(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
                             cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
                 }
             } else {
@@ -514,32 +537,35 @@ public class Sistemas2 {
         }
     }
 
-    public static void imprimeNominas(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
+    public static void imprimeNominas(Trabajadorbbdd str, double[] cuotasCalculadas, Categorias bruto,
             double calculoBase, LocalDate fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
             int anos, int trienio, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
 
         Locale SPAIN = new Locale("es", "ES");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String fechaAlta = formatter.format(str.getFechaAlta());
+                            
         if (calculoBase == 0.0) {
             System.out.println("\n********************EXTRA********************");
         }
 
         System.out.printf(String.format("NOMINA de: %s - %s\n", fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).toUpperCase(), fecha.getYear()));
 
-        System.out.printf("Empresa: %s\n", str.getNombreEmpresa());
-        System.out.printf("CIF: %s\n", str.getCifEmpresa());
+        System.out.printf("Empresa: %s\n", str.getEmpresas().getNombre());
+        System.out.printf("CIF: %s\n", str.getEmpresas().getCif());
         System.out.println("----------------------------------------------------");
 
         System.out.printf("Nombre: %s\n", str.getNombre());
         System.out.printf("Apellidos: %s %s\n", str.getApellido1(), str.getApellido2());
-        System.out.printf("DNI: %s\n", str.getDni());
-        System.out.printf("Fecha de alta: %s\n", str.getFechaAltaEmpresa());
-        System.out.printf("Categoria: %s\n", str.getCategoria());
-        System.out.printf("Bruto Anual: %.2f€\n", bruto[0]);
+        System.out.printf("DNI: %s\n", str.getNifnie());
+        System.out.printf("Fecha de alta: %s\n", fechaAlta);
+        System.out.printf("Categoria: %s\n", str.getCategorias().getNombreCategoria());
+        System.out.printf("Bruto Anual: %.2f€\n", bruto.getSalarioBaseCategoria());
         System.out.printf("IBAN: %s\n", str.getIban());
 
         System.out.printf("Salario Base: %.2f€\n", salarioBase);
         System.out.printf("Prorrateo: %.2f€\n", cantidadProrrateo);
-        System.out.printf("Complemento: %.2f€\n", bruto[1] / 14);
+        System.out.printf("Complemento: %.2f€\n", bruto.getComplementoCategoria()/ 14);
         System.out.printf("Trienios: %d€\n", trienio);
         System.out.printf("Antiguedad: %d años\n", anos);
         System.out.println("----------------------------------------------------");
@@ -573,13 +599,15 @@ public class Sistemas2 {
 
     }
 
-    public static void imprimirArchivo(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
+    public static void imprimirArchivo(Trabajadorbbdd str, double[] cuotasCalculadas, Categorias bruto,
             double calculoBase, LocalDate fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
             int anos, int trienio, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
 
         Locale SPAIN = new Locale("es", "ES");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String fechaAlta = formatter.format(str.getFechaAlta());
 
-        String file = str.getDni() + str.getNombre() + str.getApellido1() + str.getApellido2()
+        String file = str.getNifnie()+ str.getNombre() + str.getApellido1() + str.getApellido2()
                 + fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).toUpperCase() + fecha.getYear();
 
         if (calculoBase == 0.0) {
@@ -596,21 +624,21 @@ public class Sistemas2 {
 
             myWriter.write(String.format("NOMINA de: %s - %s\n", fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).toUpperCase(), fecha.getYear()));
 
-            myWriter.write(String.format("Empresa: %s\n", str.getNombreEmpresa()));
-            myWriter.write(String.format("CIF: %s\n", str.getCifEmpresa()));
+            myWriter.write(String.format("Empresa: %s\n", str.getEmpresas().getNombre()));
+            myWriter.write(String.format("CIF: %s\n", str.getEmpresas().getCif()));
             myWriter.write("----------------------------------------------------\n");
 
             myWriter.write(String.format("Nombre: %s\n", str.getNombre()));
             myWriter.write(String.format("Apellidos: %s %s\n", str.getApellido1(), str.getApellido2()));
-            myWriter.write(String.format("DNI: %s\n", str.getDni()));
-            myWriter.write(String.format("Fecha de alta: %s\n", str.getFechaAltaEmpresa()));
-            myWriter.write(String.format("Categoria: %s\n", str.getCategoria()));
-            myWriter.write(String.format("Bruto Anual: %.2f€\n", bruto[0]));
+            myWriter.write(String.format("DNI: %s\n", str.getNifnie()));
+            myWriter.write(String.format("Fecha de alta: %s\n", fechaAlta));
+            myWriter.write(String.format("Categoria: %s\n", str.getCategorias().getNombreCategoria()));
+            myWriter.write(String.format("Bruto Anual: %.2f€\n", bruto.getSalarioBaseCategoria()));
             myWriter.write(String.format("IBAN: %s\n", str.getIban()));
 
             myWriter.write(String.format("Salario Base: %.2f€\n", salarioBase));
             myWriter.write(String.format("Prorrateo: %.2f€\n", cantidadProrrateo));
-            myWriter.write(String.format("Complemento: %.2f€\n", bruto[1] / 14));
+            myWriter.write(String.format("Complemento: %.2f€\n", bruto.getComplementoCategoria() / 14));
             myWriter.write(String.format("Trienios: %d€\n", trienio));
             myWriter.write(String.format("Antiguedad: %d años\n", anos));
             
@@ -647,14 +675,16 @@ public class Sistemas2 {
         }
     }
     
-    public static void imprimirPDF(EmpleadoWorbu str, double[] cuotasCalculadas, double[] bruto,
+    public static void imprimirPDF(Trabajadorbbdd str, double[] cuotasCalculadas, Categorias bruto,
             double calculoBase, LocalDate fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
             int anos, int trienio, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
 
         String imagen = "resources\\logo.png";
         Locale SPAIN = new Locale("es", "ES");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+        String fechaAlta = formatter.format(str.getFechaAlta());
 
-        String file = str.getDni() + str.getNombre() + str.getApellido1() + str.getApellido2()
+        String file = str.getNifnie()+ str.getNombre() + str.getApellido1() + str.getApellido2()
                 + fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).toUpperCase() + fecha.getYear();
 
         if (calculoBase == 0.0) {
@@ -746,9 +776,9 @@ public class Sistemas2 {
             celda1.setVerticalAlignment(VerticalAlignment.MIDDLE);
             celda1.setTextAlignment(TextAlignment.CENTER);
             Paragraph nombreEmpresa = new Paragraph(
-                    String.format("%s", str.getNombreEmpresa()))
+                    String.format("%s", str.getEmpresas().getNombre()))
                     .setFontSize(14);
-            Paragraph cifEmpresa = new Paragraph(String.format("CIF: %s", str.getCifEmpresa()))
+            Paragraph cifEmpresa = new Paragraph(String.format("CIF: %s", str.getEmpresas().getCif()))
                     .setFontSize(14);
             celda1.add(nombreEmpresa);
             celda1.add(cifEmpresa);
@@ -791,11 +821,11 @@ public class Sistemas2 {
                     .setFontSize(12);
             celda3.add(nombreTra);            
             Paragraph dniTra = new Paragraph()
-                    .add(String.format("DNI: %s", str.getDni()))
+                    .add(String.format("DNI: %s", str.getNifnie()))
                     .setFontSize(12);
             celda3.add(dniTra);            
             Paragraph altaTra = new Paragraph()
-                    .add(String.format("Fecha de alta: %s", str.getFechaAltaEmpresa()))
+                    .add(String.format("Fecha de alta: %s", fechaAlta))
                     .setFontSize(12);
             celda3.add(altaTra);
             tabla2.addCell(celda3);
@@ -809,11 +839,11 @@ public class Sistemas2 {
                     .setFontSize(12);
             celda4.add(ibanTra); 
             Paragraph catTra = new Paragraph()
-                    .add(String.format("Categoria: %s", str.getCategoria()))
+                    .add(String.format("Categoria: %s", str.getCategorias().getNombreCategoria()))
                     .setFontSize(14);
             celda4.add(catTra);            
             Paragraph brutoTra = new Paragraph()///////////////////////////////////ESTO HAY QUE CAMBIARLO
-                    .add(String.format("Bruto anual: %s€", str.getDni()))
+                    .add(String.format("Bruto anual: %s€", str.getNifnie()))
                     .setFontSize(14);
             celda4.add(brutoTra);
             tabla2.addCell(celda4);
