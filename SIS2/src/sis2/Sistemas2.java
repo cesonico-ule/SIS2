@@ -4,9 +4,13 @@ import Modelo.*;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.*;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.*;
 import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.property.BorderCollapsePropertyValue;
+import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
@@ -518,11 +522,11 @@ public class Sistemas2 {
             }
             // --- IMPRIMIR --- //
             if (archivo) {
-                imprimirArchivo(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+                imprimirPDF(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
                         cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
 
                 if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
-                    imprimirArchivo(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
+                    imprimirPDF(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
                             cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
                 }
             } else {
@@ -696,71 +700,13 @@ public class Sistemas2 {
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document doc = new Document(pdfDoc, PageSize.LETTER);
 
-            /**
-             * *****************
-             * CUADRO DATOS DE LA EMPRESA 
-             * *****************
-             */
-            Paragraph empty = new Paragraph("");
-            /*
-            Table tabla1 = new Table(2);
-            tabla1.useAllAvailableWidth();
+            Paragraph parrafo;
+            Table tabla1, tabla2, tabla3;
+            LineSeparator lineaHor = new LineSeparator(new SolidLine(1f));
             
-            tabla1.setBorder(new SolidBorder(2));
-            tabla1.setHorizontalAlignment(HorizontalAlignment.CENTER);
-
-            Paragraph nom = new Paragraph("NOMBRE");
-            Paragraph cif = new Paragraph("CIF: ");
-
-            Paragraph dir1 = new Paragraph("Avenida de la facultad - 6");
-            Paragraph dir2 = new Paragraph("24001 León");
-
-            Cell cell1 = new Cell();
-            cell1.setBorder(new SolidBorder(1));
-            cell1.setWidth(100);
-            cell1.setTextAlignment(TextAlignment.CENTER);
-
-            cell1.add(nom);
-            cell1.add(cif);
-            cell1.add(dir1);
-            cell1.add(dir2);
-            tabla1.addCell(cell1);
-
-            Cell cell2 = new Cell();
-            cell2.setBorder(new SolidBorder(1));
-            cell2.setPadding(10);
-            cell2.setTextAlignment(TextAlignment.RIGHT);
-            cell2.add(new Paragraph("IBAN: "));
-            cell2.add(new Paragraph("Bruto anual: "));
-            cell2.add(new Paragraph("Categoría: "));
-            cell2.add(new Paragraph("Fecha de alta: "));
-            tabla1.addCell(cell2);
-            
-            
-            Table tabla2 = new Table(2);
-
-            tabla2.setWidth(500);
-            Image img = new Image(ImageDataFactory.create(imagen));
-            img.setBorder(Border.NO_BORDER);
-            img.setPadding(10);
-
-            Cell cell3 = new Cell();
-            cell3.add(img);
-            cell3.setBorder(new SolidBorder(1));
-            cell3.setPaddingLeft(23);
-            cell3.setPaddingTop(20);
-
-            cell3.setWidth(250);
-            tabla2.addCell(cell3);
-            tabla2.addCell(cell3);
-
-            doc.add(tabla1);
-            doc.add(tabla2);
-            */
-
-            Table tabla=new Table(2);
-            tabla.useAllAvailableWidth();            
-            tabla.setBorder(Border.NO_BORDER);
+            tabla2=new Table(2);
+            tabla2.useAllAvailableWidth();            
+            tabla2.setBorder(Border.NO_BORDER);
             
             //Impresion del logo            
             Cell celda =new Cell();
@@ -768,88 +714,393 @@ public class Sistemas2 {
             Image img = new Image(ImageDataFactory.create(imagen));
             img.setBorder(Border.NO_BORDER);
             celda.add(img);
-            tabla.addCell(celda);
+            tabla2.addCell(celda);
             
             //Impresion de los datos de la empresa
-            Cell celda1 = new Cell();
-            celda1.setBorder(Border.NO_BORDER);
-            celda1.setVerticalAlignment(VerticalAlignment.MIDDLE);
-            celda1.setTextAlignment(TextAlignment.CENTER);
-            Paragraph nombreEmpresa = new Paragraph(
+            celda = new Cell();
+            celda.setBorder(Border.NO_BORDER);
+            celda.setVerticalAlignment(VerticalAlignment.MIDDLE);
+            celda.setTextAlignment(TextAlignment.CENTER);
+            parrafo = new Paragraph(
                     String.format("%s", str.getEmpresas().getNombre()))
                     .setFontSize(14);
-            Paragraph cifEmpresa = new Paragraph(String.format("CIF: %s", str.getEmpresas().getCif()))
+            celda.add(parrafo);
+            parrafo = new Paragraph(String.format("CIF: %s", str.getEmpresas().getCif()))
                     .setFontSize(14);
-            celda1.add(nombreEmpresa);
-            celda1.add(cifEmpresa);
-            tabla.addCell(celda1);
-            doc.add(tabla);
+            celda.add(parrafo);
+            tabla2.addCell(celda);
+            doc.add(tabla2);
             
-            Table tabla1 = new Table(1);
+            tabla1 = new Table(1);
             tabla1.useAllAvailableWidth();                     
             tabla1.setBorder(Border.NO_BORDER);
             
             //Impresion de la fecha
-            Cell celda2 = new Cell();
-            celda2.setBorder(Border.NO_BORDER);
-            Paragraph parFecha = new Paragraph();
+            celda = new Cell();
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph();
             if (calculoBase == 0.0) {
-                parFecha.add(String.format("NOMINA EXTRA: %s - %s",
+                parrafo.add(String.format("NOMINA: EXTRA %s - %s",
                         fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).
                                 toUpperCase(), fecha.getYear()));
             }else{
-                parFecha.add(String.format("NOMINA: %s - %s",
+                parrafo.add(String.format("NOMINA: %s - %s",
                     fecha.getMonth().getDisplayName(TextStyle.FULL, SPAIN).
                             toUpperCase(), fecha.getYear()));
             }
-            parFecha.setFontSize(18)    
+            parrafo.setFontSize(18)    
                     .setTextAlignment(TextAlignment.CENTER)
                     .setUnderline()
                     .setBold();
-            celda2.add(parFecha);            
-            tabla1.addCell(celda2);
+            celda.add(parrafo);            
+            tabla1.addCell(celda);
             doc.add(tabla1);
+            doc.add(lineaHor);
             
             //Imprimir Datos Trabajador
-            Table tabla2 = new Table(2);
+            tabla2 = new Table(2);
+            tabla2.useAllAvailableWidth();
             
-            Cell celda3 = new Cell();
-            celda3.setWidth(250);                 
-            celda3.setBorder(Border.NO_BORDER);
-            Paragraph nombreTra = new Paragraph()
+            celda = new Cell();
+            celda.setWidth(250);                 
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
                     .add(String.format("%s %s %s", str.getNombre(), str.getApellido1(), str.getApellido2()))
                     .setFontSize(12);
-            celda3.add(nombreTra);            
-            Paragraph dniTra = new Paragraph()
+            celda.add(parrafo);            
+            parrafo = new Paragraph()
                     .add(String.format("DNI: %s", str.getNifnie()))
                     .setFontSize(12);
-            celda3.add(dniTra);            
-            Paragraph altaTra = new Paragraph()
+            celda.add(parrafo);            
+            parrafo = new Paragraph()
                     .add(String.format("Fecha de alta: %s", fechaAlta))
                     .setFontSize(12);
-            celda3.add(altaTra);
-            tabla2.addCell(celda3);
+            celda.add(parrafo);
+            tabla2.addCell(celda);
             
-            Cell celda4 = new Cell();            
-            celda4.setWidth(250);
-            celda4.setTextAlignment(TextAlignment.RIGHT);                    
-            celda4.setBorder(Border.NO_BORDER);
-            Paragraph ibanTra = new Paragraph()
+            celda = new Cell();            
+            celda.setWidth(250);
+            celda.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            celda.setTextAlignment(TextAlignment.RIGHT);                    
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
                     .add(String.format("IBAN: %s", str.getIban()))
                     .setFontSize(12);
-            celda4.add(ibanTra); 
-            Paragraph catTra = new Paragraph()
+            celda.add(parrafo); 
+            parrafo = new Paragraph()
                     .add(String.format("Categoria: %s", str.getCategorias().getNombreCategoria()))
-                    .setFontSize(14);
-            celda4.add(catTra);            
-            Paragraph brutoTra = new Paragraph()///////////////////////////////////ESTO HAY QUE CAMBIARLO
-                    .add(String.format("Bruto anual: %s€", str.getNifnie()))
-                    .setFontSize(14);
-            celda4.add(brutoTra);
-            tabla2.addCell(celda4);
+                    .setFontSize(12);
+            celda.add(parrafo);            
+            parrafo = new Paragraph()
+                    .add(String.format("Bruto anual: %s€", str.getCategorias().getSalarioBaseCategoria()))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla2.addCell(celda);
             doc.add(tabla2);
+            doc.add(lineaHor);
+
+            //Salario base + comp + antiguedad+ prorrateo
+            //Titulo
+            tabla1 = new Table(1);
+            celda = new Cell(); 
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
+                    .add("Importes a percibir")
+                    .setFontSize(15);
+            celda.add(parrafo);    
+            tabla1.addCell(celda);
+            doc.add(tabla1);
+            //Campos
+            tabla2 = new Table(2);   
+            tabla2.useAllAvailableWidth();
+            celda = new Cell();
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
+                    .add("Salario Base:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Prorrateo:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Complemento:\n")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("Antiguedad:\t\t\t\t\t\t\t\t\t\t\t\t\t %d años", anos))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Total devengos:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla2.addCell(celda);
+            //Valores
+            celda = new Cell();               
+            celda.setWidth(200);
+            celda.setBorder(Border.NO_BORDER);
+            celda.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            celda.setTextAlignment(TextAlignment.RIGHT);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", salarioBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cantidadProrrateo))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", bruto.getComplementoCategoria() / 14))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%d€", trienio))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", brutoMes))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla2.addCell(celda);
+            doc.add(tabla2);
+            doc.add(lineaHor);
             
+            //Deducciones Trabajador
+            //Titulo
+            tabla1 = new Table(1);
+            celda = new Cell(); 
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
+                    .add("Deducciones")
+                    .setFontSize(15);
+            celda.add(parrafo);    
+            tabla1.addCell(celda);
+            doc.add(tabla1);
+            //Campos
+            tabla3 = new Table(3);   
+            tabla3.useAllAvailableWidth();
+            celda = new Cell();
+            celda.setWidth(200);
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
+                    .add("Contingencias generales:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Desempleo:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Cuota formación:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("IRPF:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Total deducciones:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Total devengos:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla3.addCell(celda);
+            //Porcentajes
+            celda = new Cell();
+            celda.setWidth(150);
+            celda.setBorder(Border.NO_BORDER);
+            celda.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getCuotaObreraGeneralTrabajador(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getCuotaDesempleoTrabajador(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getCuotaFormacionTrabajador(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", porcentajeIRPF, brutoMes))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla3.addCell(celda);
+            //Valores
+            celda = new Cell();               
+            celda.setWidth(150);
+            celda.setBorder(Border.NO_BORDER);
+            celda.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            celda.setTextAlignment(TextAlignment.RIGHT);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[0]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[1]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[2]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", irpf))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", totalTrabajador))
+                    .setFontSize(12)
+                    .setFontColor(ColorConstants.RED);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", brutoMes-totalTrabajador))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla3.addCell(celda);
+            doc.add(tabla3);
+            doc.add(lineaHor);
             
+            //Calculos Empresario
+            //Titulo
+            tabla2 = new Table(2);
+            celda = new Cell();           
+            celda.setWidth(250);
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
+                    .add("Empresario BASE:")
+                    .setFontSize(15);
+            celda.add(parrafo);    
+            tabla2.addCell(celda);
+            celda = new Cell();            
+            celda.setWidth(250);
+            celda.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            celda.setTextAlignment(TextAlignment.RIGHT);                    
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", calculoBase))
+                    .setFontSize(15);
+            celda.add(parrafo);    
+            tabla2.addCell(celda);
+            doc.add(tabla2);
+            //Campos
+            tabla3 = new Table(3);   
+            tabla3.useAllAvailableWidth();
+            celda = new Cell();
+            celda.setWidth(200);
+            celda.setBorder(Border.NO_BORDER);
+            parrafo = new Paragraph()
+                    .add("Contingencias comunes:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Desempleo:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Formación:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Accidentes de trabajo:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("FOGASA:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add("Total empresario:")
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla3.addCell(celda);
+            //Porcentajes
+            celda = new Cell();
+            celda.setWidth(150);
+            celda.setBorder(Border.NO_BORDER);
+            celda.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getContingenciasComunesEmpresario(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getDesmpleoEmpresario(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getFormacionEmpresario(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getAccidentesTrabajoEmpresario(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f%% de %.2f", datosCuotas.getFogasaEmpresario(), calculoBase))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            tabla3.addCell(celda);
+            //Valores
+            celda = new Cell();               
+            celda.setWidth(150);
+            celda.setBorder(Border.NO_BORDER);
+            celda.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            celda.setTextAlignment(TextAlignment.RIGHT);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[3]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[5]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[6]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[7]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", cuotasCalculadas[4]))
+                    .setFontSize(12);
+            celda.add(parrafo);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", totalEmpleador))
+                    .setFontSize(12)
+                    .setFontColor(ColorConstants.RED);
+            celda.add(parrafo);
+            tabla3.addCell(celda);
+            doc.add(tabla3);
+            
+            //Total coste empresario
+            tabla2 = new Table(2); 
+            tabla2.setBorderCollapse(BorderCollapsePropertyValue.SEPARATE);
+            tabla2.setVerticalBorderSpacing(10);
+            tabla2.useAllAvailableWidth();
+            celda = new Cell();
+            celda.setBorder(new SolidBorder(2));
+            parrafo = new Paragraph()
+                    .add("COSTE TOTAL TRABAJADOR:")
+                    .setFontSize(12)
+                    .setFontColor(ColorConstants.RED);
+            celda.add(parrafo);
+            tabla2.addCell(celda);
+            celda = new Cell();
+            celda.setBorder(new SolidBorder(2));
+            celda.setTextAlignment(TextAlignment.RIGHT);
+            parrafo = new Paragraph()
+                    .add(String.format("%.2f€", totalEmpleador+brutoMes))
+                    .setFontSize(12)
+                    .setFontColor(ColorConstants.RED);
+            celda.add(parrafo);
+            tabla2.addCell(celda);
+            doc.add(tabla2);
             
             doc.close();
         }
