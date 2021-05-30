@@ -5,11 +5,11 @@ package sistemas2;
  * @author Ares Alfayate Santiago
  * @author Bermejo Fernandez Cesar
  */
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import java.util.ArrayList;
 
 import org.jdom2.Document;
@@ -36,13 +36,14 @@ public class Errores {
             doc.getRootElement().addContent(employee);
         }
         
-        //JDOM document is ready now, lets write it to file now
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-        //output xml to console for debugging
-        //xmlOutputter.output(doc, System.out);
+        
         try{
             File f = new File(fileName+extension);
-            if (f.exists()) fileName+="(1)";
+            while (f.exists()) {
+                fileName += "(1)";
+                f = new File(fileName+extension);
+            }
             xmlOutputter.output(doc, new FileOutputStream(fileName+extension));
         }
         catch (FileNotFoundException e){
@@ -56,7 +57,6 @@ public class Errores {
     }
    
     public static void generaErrorCCC(ArrayList<EmpleadoWorbu> empList){
-        //Crear metodo comun para no repetir codigo
         String fileName = "resources\\ErroresCCC";        
         String extension = ".xml";
 
@@ -75,13 +75,14 @@ public class Errores {
             doc.getRootElement().addContent(employee);
         }
         
-        //JDOM document is ready now, lets write it to file now
         XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-        //output xml to console for debugging
-        //xmlOutputter.output(doc, System.out);
+        
         try{
             File f = new File(fileName+extension);
-            if (f.exists()) fileName+="(1)";
+            while (f.exists()){
+                fileName += "(1)";
+                f = new File(fileName+extension);
+            }
             xmlOutputter.output(doc, new FileOutputStream(fileName+extension));
         }
         catch (FileNotFoundException e){
@@ -93,26 +94,5 @@ public class Errores {
             e.printStackTrace();
         }
     }
-    /*
-    public static void writeFileUsingJDOM(ArrayList<EmpleadoWorbu> empList, String fileName) throws IOException {
-        Document doc = new Document();
-        doc.setRootElement(new Element("Trabajadores"));
-        for(EmpleadoWorbu emp : empList){
-            Element employee = new Element("Trabajador");
-            employee.setAttribute("id",""+emp.getFila());
-            employee.addContent(new Element("Nombre").setText(""+emp.getNombre()));
-            employee.addContent(new Element("PrimerApellido").setText(emp.getApellido1()));
-            employee.addContent(new Element("SegundoApellido").setText(emp.getApellido2()));
-            employee.addContent(new Element("Empresa").setText(emp.getNombreEmpresa()));
-            employee.addContent(new Element("Categoria").setText(emp.getCategoria()));
-            doc.getRootElement().addContent(employee);
-        }
-        //JDOM document is ready now, lets write it to file now
-        XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-        //output xml to console for debugging
-        //xmlOutputter.output(doc, System.out);
-        xmlOutputter.output(doc, new FileOutputStream(fileName));
-    }
-*/
 }
 

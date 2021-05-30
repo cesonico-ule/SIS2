@@ -1,6 +1,7 @@
 package sistemas2;
 
 import Modelo.*;
+
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.*;
@@ -52,79 +53,12 @@ public class Sistemas2 {
     static ArrayList<Integer> trienios = null;
     static TreeMap<Double, Double> brutoExcel = null;
     static SalarioDatos datosCuotas = null;
-
+    
     static Map<String, Categorias> categorias = null;
     static Map<String, Empresas> empres = new HashMap<>(1);
     static Set<Trabajadorbbdd> trabajadores = null;
+    static Set<Nomina> nominaa = new HashSet();
 
-    public static Set<Trabajadorbbdd> traductor(ArrayList<EmpleadoWorbu> emp) {
-        Set<Trabajadorbbdd> lista = new HashSet();
-        Trabajadorbbdd aux = null;
-
-        Empresas auxEmp = null;
-
-        for (EmpleadoWorbu str : emp) {
-            aux = new Trabajadorbbdd();
-            aux.setNombre(str.getNombre());
-            aux.setApellido1(str.getApellido1());
-            aux.setApellido2(str.getApellido2());
-            aux.setNifnie(str.getDni());
-            aux.setEmail(str.getEmail());
-
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                Date fecha = formatter.parse(str.getFechaAltaEmpresa());
-                aux.setFechaAlta(fecha);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            aux.setCodigoCuenta(str.getCodCuenta());
-            aux.setIban(str.getIban());
-
-            aux.setProrrata(str.isProrrata());
-            aux.setFila(str.getFila());
-            aux.setCccError(str.getCCCError());
-            aux.setPaisCuenta(str.getPaisCuenta());
-
-            //Añadir trabajador a la empresa correcta
-            if (empres.get(str.getCifEmpresa()) != null) {//control de errores
-                Empresas e = empres.get(str.getCifEmpresa());
-                Set f = e.getTrabajadorbbdds();
-                aux.setEmpresas(e);
-                f.add(aux);
-                e.setTrabajadorbbdds(f);
-            }
-
-            //Añadir trabajador a la categoria correcta
-            if (categorias.get(str.getCategoria()) != null) {//control de errores
-                Categorias a = categorias.get(str.getCategoria());
-                Set b = a.getTrabajadorbbdds();
-                aux.setCategorias(a);
-                b.add(aux);
-                a.setTrabajadorbbdds(b);
-            }
-
-            lista.add(aux);
-        }
-        return lista;
-    }
-
-    //Crea entrada para cada empresa nueva, CIF no conocido
-    public static Map<String, Empresas> traductorEmpresas(ArrayList<EmpleadoWorbu> emp) {
-        Empresas aux;
-
-        for (EmpleadoWorbu str : emp) {
-            aux = new Empresas();
-            aux.setNombre(str.getNombreEmpresa());
-            aux.setCif(str.getCifEmpresa());
-
-            if (!empres.containsKey(str.getCifEmpresa())) {
-
-                empres.put(str.getCifEmpresa(), aux);
-            }
-        }
-        return empres;
-    }
 
     public static void main(String[] args) {
         /*
@@ -144,10 +78,9 @@ public class Sistemas2 {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 //      ___________________Fin obtencion de datos___________________
-//        Practica 3 - Ejecucion para la entrega
-        compruebaDNIs(); //ahora borra de la lista los que tienen errores (blanco o repetido)
+
+        compruebaDNIs();
         compruebaIBANs();
         creaEMAILs();
 
@@ -156,11 +89,15 @@ public class Sistemas2 {
         //Creamos los trabajadores y los enlazamos a las empresas y categorias
         trabajadores = traductor(empleados);
 
-        generaNominas("12/2021", true);
-        /*
-        boolean salir = false;
         Scanner sc = new Scanner(System.in);
-        while (!salir) {
+        System.out.println("*** Introduzca el mes y año de la nomina a calcular ***");
+        generaNominas(sc.next(), false);
+        generaBD();
+        
+        // <editor-fold defaultstate="collapsed" desc="Selector de opciones">
+        /*         
+        boolean continuar = true;        
+        while (continuar) {
             System.out.println(
                     "\n¿Que desea hacer?\n"
                     + "1. Comprobar los DNIs\n"
@@ -168,13 +105,13 @@ public class Sistemas2 {
                     + "3. Generar los emails\n"
                     + "4. Tarea completa\n"
                     + "5. Generar nominas por pantalla\n"
-                    + "5. Generar nominas en archivos"
+                    + "5. Generar nominas en archivos txt"
                     + "\n0. Salir\n");
 
             switch (sc.next()) {
                 case "0":
                     System.out.println("Saliendo del programa...");
-                    salir = true;
+                    continuar = false;
                     break;
 
                 case "1":
@@ -213,30 +150,99 @@ public class Sistemas2 {
                     generaNominas("12/2021", false);
                     break;
             }
-        }*/
+        }*/ //</editor-fold>
     }
 
+    public static Set<Trabajadorbbdd> traductor(ArrayList<EmpleadoWorbu> emp) {
+        Set<Trabajadorbbdd> lista = new HashSet();
+        Trabajadorbbdd aux = null;
+
+        Empresas auxEmp = null;
+
+        for (EmpleadoWorbu str : emp) {
+            aux = new Trabajadorbbdd();
+            aux.setNombre(str.getNombre());
+            aux.setApellido1(str.getApellido1());
+            aux.setApellido2(str.getApellido2());
+            aux.setNifnie(str.getDni());
+            aux.setEmail(str.getEmail());
+
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                Date fecha = formatter.parse(str.getFechaAltaEmpresa());
+                aux.setFechaAlta(fecha);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            aux.setCodigoCuenta(str.getCodCuenta());
+            aux.setIban(str.getIban());
+
+            aux.setProrrata(str.isProrrata());
+            aux.setFila(str.getFila());
+            aux.setCccError(str.getCCCError());
+            aux.setPaisCuenta(str.getPaisCuenta());
+
+//            //Añadir trabajador a la empresa correcta
+            if (empres.get(str.getCifEmpresa()) != null) {//control de errores
+                Empresas e = empres.get(str.getCifEmpresa());
+                Set f = e.getTrabajadorbbdds();
+                aux.setEmpresas(e);
+                f.add(aux);
+                e.setTrabajadorbbdds(f);
+            }
+
+//            //Añadir trabajador a la categoria correcta
+//            if (categorias.get(str.getCategoria()) != null) {//control de errores
+                Categorias a = categorias.get(str.getCategoria());
+//                Set b = a.getTrabajadorbbdds();
+                aux.setCategorias(a);
+//                b.add(aux);
+//                a.setTrabajadorbbdds(b);
+//            }
+
+            lista.add(aux);
+        }
+        return lista;
+    }
+
+    //Crea entrada para cada empresa nueva, CIF no conocido
+    public static Map<String, Empresas> traductorEmpresas(ArrayList<EmpleadoWorbu> emp){
+        Empresas aux;
+
+        for (EmpleadoWorbu str : emp) {
+            aux = new Empresas();
+            aux.setNombre(str.getNombreEmpresa());
+            aux.setCif(str.getCifEmpresa());
+
+            if (!empres.containsKey(str.getCifEmpresa())) {
+
+                empres.put(str.getCifEmpresa(), aux);
+            }
+        }
+        return empres;
+    }
+    
     public static void compruebaDNIs() {
         ArrayList<String> lista = new ArrayList<>();
         ArrayList<EmpleadoWorbu> errorEmp = new ArrayList();
 
         for (EmpleadoWorbu str : empleados) {
             if (str.getDni() == null || str.getDni() == "") {//no tiene DNI - error
-                System.out.println("DNI en blanco - Error");
+//                System.out.println("DNI en blanco - Error");
                 errorEmp.add(str);
 
             } else {
                 char letra = Herramientas.calculoDNI(str.getDni());
-                System.out.println("DNI leido: " + str.getDni().substring(0, 8));
+//                System.out.println("DNI leido: " + str.getDni().substring(0, 8));
 
                 if (lista.contains(str.getDni().substring(0, 8))) {//DNI ya procesado - error
-                    System.out.println("DNI ya procesado - Error");
+//                    System.out.println("DNI ya procesado - Error");
                     errorEmp.add(str);
 
                 } else {//entramos cuando hay que procesar el DNI
                     lista.add(str.getDni().substring(0, 8));
                     if (letra != str.getDni().charAt(8)) {//letra no coincide
-                        System.out.println("Actualizando DNI");
+//                        System.out.println("Actualizando DNI");
                         ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 7, str.getDni().replace(str.getDni().charAt(8), letra));
                     }
                     //DNI correcto - no hacer nada
@@ -311,7 +317,7 @@ public class Sistemas2 {
 
                 }
                 correo += str.getNombreEmpresa() + ".com";
-                System.out.println(correo);
+//                System.out.println(correo);
                 str.setEmail(correo);
                 ManejadorExcel.actualizarCelda(fichero, 3, str.getFila(), 12, correo);
             }
@@ -340,7 +346,7 @@ public class Sistemas2 {
 
             Query query = sesion.createQuery(consultaHQL);
             query.setParameter("param1", dni);
-
+            
             List<Trabajadorbbdd> listaResultado = query.list();
 
             //Tarea 1
@@ -430,25 +436,11 @@ public class Sistemas2 {
 
         for (Trabajadorbbdd str : trabajadores) {
 
-            Date date = str.getFechaAlta();// the date instance
+            Date date = str.getFechaAlta();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
 
             LocalDate alta = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-
-//            System.out.println(asdasdasdads);
-//            
-//            
-//            
-//            String fechaAux = "";
-//            //fechaAux+= String.format(%2, calendar.get(Calendar.DAY_OF_MONTH));
-//            fechaAux+= "/";
-//            //fechaAux+= calendar.get(Calendar.mo);
-//            fechaAux+= "/";
-//            fechaAux+= calendar.get(Calendar.YEAR);
-//            
-//            System.out.println(fechaAux);
-//            LocalDate alta = LocalDate.parse(fechaAux, formato);
             anos = (int) ChronoUnit.YEARS.between(alta, fech);//antiguedad a dia de nomina
             meses = (int) ChronoUnit.MONTHS.between(alta, fech);//antiguedad a dia de nomina
             anos_enero = (int) ChronoUnit.YEARS.between(alta, enero);
@@ -473,9 +465,6 @@ public class Sistemas2 {
             } else {//recien contratado
                 if (str.isProrrata()) {
                     calculoirpf = brutoAnual / 12 * meses;
-//                    brutoMes = brutoAnual/12;
-//                    if (meses>5) meses++;
-//                    brutoMes *= meses;
 
                 } else {
                     meses = 12 - alta.getMonthValue();
@@ -484,10 +473,8 @@ public class Sistemas2 {
                     }
 
                     calculoirpf = brutoAnual / 14 * meses;
-//                    brutoMes = brutoAnual/14*meses;
                     if (meses - 6 > 0) {
                         calculoirpf += brutoAnual / 14 * ((meses - 6) / 6);
-//                        brutoMes += brutoAnual / 14 * ((meses - 6) / 6);;
                     }
                 }
             }
@@ -496,13 +483,10 @@ public class Sistemas2 {
             if (str.isProrrata()) {
                 irpf = calculoBase * porcentajeIRPF / 100;
                 brutoMes = calculoBase;
-//                salarioBase = bruto[0] / 14;
 
             } else {
                 irpf = brutoMes * porcentajeIRPF / 100;
-                //salarioBase = (bruto[0] - cantidadProrrateo) / 14;
                 cantidadProrrateo = 0;
-                //irpf se hace sobre salarioBase
             }
 
             cuotasCalculadas = datosCuotas.datosCuotas();
@@ -523,97 +507,229 @@ public class Sistemas2 {
 
             }
 
-            // Genero objeto nomina
-            Nomina nomina = new Nomina();
+//            // --- IMPRIMIR POR PANTALLA O TXT --- //
+//            if (archivo) {
+//                imprimirArchivo(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+//                        cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
+//
+//                if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
+//                    imprimirArchivo(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
+//                            cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
+//                }
+//            } else {
+//                imprimeNominas(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+//                        cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
+//
+//                if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
+//                    imprimeNominas(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
+//                            cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
+//                }
+//            }
 
-            //Trabajador
-            nomina.setTrabajadorbbdd(str);
-
-            //IRPF
-            nomina.setImporteIrpf(porcentajeIRPF);
-            nomina.setIrpf(irpf);
-
-            //Bruto
-            nomina.setBrutoAnual(brutoAnual);
-            nomina.setBrutoNomina(brutoMes);
-
-            //Liquido
-            nomina.setLiquidoNomina(brutoMes - totalTrabajador);
-
-            //Trienios
-            nomina.setNumeroTrienios(anos); //Esto podria dividido entre 3 y truncado
-            nomina.setImporteTrienios(Double.valueOf(trienio));
-
-            //Accidentes
-            nomina.setAccidentesTrabajoEmpresario(datosCuotas.getAccidentesTrabajoEmpresario());
-            nomina.setImporteAccidentesTrabajoEmpresario(cuotasCalculadas[7]);
-
-            //Desempleo
-            nomina.setDesempleoEmpresario(datosCuotas.getDesmpleoEmpresario());
-            nomina.setDesempleoTrabajador(datosCuotas.getCuotaDesempleoTrabajador());
-
-            nomina.setImporteDesempleoEmpresario(cuotasCalculadas[5]);
-            nomina.setImporteDesempleoTrabajador(cuotasCalculadas[1]);
-
-            //Formacion
-            nomina.setFormacionEmpresario(datosCuotas.getFormacionEmpresario());
-            nomina.setFormacionTrabajador(datosCuotas.getCuotaFormacionTrabajador());
-
-            nomina.setImporteFormacionEmpresario(cuotasCalculadas[6]);
-            nomina.setImporteFormacionTrabajador(cuotasCalculadas[2]);
-
-            //Fogasa
-            nomina.setFogasaempresario(cuotasCalculadas[4]);
-
-            //Prorrateo
-            nomina.setValorProrrateo(cantidadProrrateo);
-
-            //Totales
-            nomina.setCosteTotalEmpresario(totalEmpleador);
-
-            /*--OTROS--
-                        nomina.setIdNomina(0);
-                
-                -Fecha
-                        nomina.setMes(0);
-                        nomina.setAnio(0);
-                
-                -Seguridad Social
-                        nomina.setSeguridadSocialEmpresario(0);
-                        nomina.setSeguridadSocialTrabajador(0);
-                
-                        nomina.setImporteSeguridadSocialEmpresario(0);
-                        nomina.setImporteSeguridadSocialTrabajador(0);
-                
-                -Fogasa
-                        nomina.setImporteFogasaempresario(0);
-                
-             */
-            //--------- NO SE     
-            nomina.setImporteComplementoMes(0.0);
-
-            nomina.setImporteSalarioMes(salarioBase);
-
-            nomina.setBaseEmpresario(0.0);
-
-            // --- IMPRIMIR --- //
-            if (archivo) {
-                imprimirPDF(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+            //Los PDF siempre se imprimen
+            generaNomi(str, cuotasCalculadas, bruto, calculoBase, parte, salarioBase, brutoMes,
                         cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
-
+            imprimirPDF(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
+                        cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
+            
                 if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
+                    generaNomi(str, cuotas0, bruto, 0.0, parte, salarioBase, brutoMes,
+                            cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
                     imprimirPDF(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
                             cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
+                    
                 }
-            } else {
-                imprimeNominas(str, cuotasCalculadas, bruto, calculoBase, fech, salarioBase, brutoMes,
-                        cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, totalTrabajador, totalEmpleador);
+        }
+    }
+   
+    public static void generaNomi(Trabajadorbbdd str, double[] cuotasCalculadas, Categorias bruto,
+            double calculoBase, String[] fecha, double salarioBase, double brutoMes, double cantidadProrrateo,
+            int anos, int trienio, double porcentajeIRPF, double irpf, double totalTrabajador, double totalEmpleador) {
+        // Genero objeto nomina
+        Nomina nomina = new Nomina();
+        //Trabajador
+        nomina.setTrabajadorbbdd(str);
+        //IRPF
+        nomina.setImporteIrpf(irpf);
+        nomina.setIrpf(porcentajeIRPF);
+        //Bruto
+        nomina.setBrutoAnual(bruto.getSalarioBaseCategoria());
+        nomina.setBrutoNomina(brutoMes);
+        //Liquido
+        nomina.setLiquidoNomina(brutoMes - totalTrabajador);
+        //Trienios
+        nomina.setNumeroTrienios(anos / 3); //Esto podria dividido entre 3 y truncado
+        nomina.setImporteTrienios(Double.valueOf(trienio));
+        //Accidentes
+        nomina.setAccidentesTrabajoEmpresario(datosCuotas.getAccidentesTrabajoEmpresario());
+        nomina.setImporteAccidentesTrabajoEmpresario(cuotasCalculadas[7]);
+        //Desempleo
+        nomina.setDesempleoEmpresario(datosCuotas.getDesmpleoEmpresario());
+        nomina.setDesempleoTrabajador(datosCuotas.getCuotaDesempleoTrabajador());
+        nomina.setImporteDesempleoEmpresario(cuotasCalculadas[5]);
+        nomina.setImporteDesempleoTrabajador(cuotasCalculadas[1]);
+        //Formacion
+        nomina.setFormacionEmpresario(datosCuotas.getFormacionEmpresario());
+        nomina.setFormacionTrabajador(datosCuotas.getCuotaFormacionTrabajador());
+        nomina.setImporteFormacionEmpresario(cuotasCalculadas[6]);
+        nomina.setImporteFormacionTrabajador(cuotasCalculadas[2]);
+        //Fogasa
+        nomina.setFogasaempresario(datosCuotas.getFogasaEmpresario());
+        nomina.setImporteFogasaempresario(cuotasCalculadas[4]);
+        //Prorrateo
+        nomina.setValorProrrateo(cantidadProrrateo);
+        //Totales
+        nomina.setCosteTotalEmpresario(totalEmpleador);
+        //Fecha
+        nomina.setMes(Integer.parseInt(fecha[0]));
+        nomina.setAnio(Integer.parseInt(fecha[1]));
+        //Seguridad Social
+        nomina.setSeguridadSocialEmpresario(datosCuotas.getContingenciasComunesEmpresario());
+        nomina.setSeguridadSocialTrabajador(datosCuotas.getCuotaObreraGeneralTrabajador());
+        nomina.setImporteSeguridadSocialEmpresario(cuotasCalculadas[3]);
+        nomina.setImporteSeguridadSocialTrabajador(cuotasCalculadas[0]);
+        //Importes comunes
+        nomina.setImporteComplementoMes(bruto.getComplementoCategoria() / 14);
+        nomina.setImporteSalarioMes(salarioBase);
+        nomina.setBaseEmpresario(calculoBase);
 
-                if ((parte[0].equals("6") || parte[0].equals("12")) && !str.isProrrata()) {
-                    imprimeNominas(str, cuotas0, bruto, 0.0, fech, salarioBase, brutoMes,
-                            cantidadProrrateo, anos, trienio, porcentajeIRPF, irpf, irpf, 0.0);
+        //Introduce la nomina en el trabajador y al archivo
+        str.getNominas().add(nomina);
+        nominaa.add(nomina);
+    }
+    
+    public static void generaBD() {
+        SessionFactory sf = null;
+        Session sesion = null;
+        Transaction tr = null; //No se usa en consultas
+        Map<String, Empresas> mapresas = new HashMap();
+        Map<String, Categorias> mapegorias = new HashMap();
+        Map<String, Trabajadorbbdd> maprajadores = new HashMap();
+        Map<String, Nomina> mapronimas = new HashMap();
+        String password;
+        //String consultaHQL = "EXISTS(SELECT * from Empresas WHERE id = :param1)";
+
+        try {
+            sf = HibernateUtil.getSessionFactory();
+            sesion = sf.openSession();
+
+            // ||------- EMPRESAS -------||
+            System.out.println("Introduciendo Empresas en la base de datos");
+            for (Empresas emp : empres.values()) {
+                String consultaHQL = "FROM Empresas t WHERE t.cif = :param1";
+
+                Query query = sesion.createQuery(consultaHQL);
+                query.setParameter("param1", emp.getCif());
+
+                Empresas empresas = (Empresas) query.uniqueResult();
+
+                if (empresas != null) {
+                    mapresas.put(emp.getCif(), empresas);
+
+                } else {
+                    tr = sesion.beginTransaction();
+                    sesion.saveOrUpdate(emp);
+                    tr.commit();
                 }
             }
+
+            // ||------- CATEGORIAS -------||
+            System.out.println("Introduciendo Categorias en la base de datos");
+            for (Categorias cat : categorias.values()) {
+                String consultaHQL = "FROM Categorias t WHERE t.nombreCategoria = :param1";
+                Query query = sesion.createQuery(consultaHQL);
+                query.setParameter("param1", cat.getNombreCategoria());
+
+                Categorias cats = (Categorias) query.uniqueResult();
+
+                if (cats != null) {
+                    mapegorias.put(cat.getNombreCategoria(), cats);
+
+                } else {
+                    tr = sesion.beginTransaction();
+                    sesion.saveOrUpdate(cat);
+                    tr.commit();
+                }
+            }
+
+            // ||------- TRABAJADORES -------||
+            System.out.println("Introduciendo Trabajadores en la base de datos");
+            for (Trabajadorbbdd str : trabajadores) {
+                String consultaHQL = "FROM Trabajadorbbdd t WHERE (t.nombre = :param1) "
+                        + "AND (t.nifnie = :param2) "
+                        + "AND (t.fechaAlta = :param3)";
+                Query query = sesion.createQuery(consultaHQL);
+                query.setParameter("param1", str.getNombre());
+                query.setParameter("param2", str.getNifnie());
+                query.setParameter("param3", str.getFechaAlta());
+
+                Trabajadorbbdd trabs = (Trabajadorbbdd) query.uniqueResult();
+
+                if (trabs != null) {
+                    password = str.getNombre() + "+" + str.getNifnie() + "+" + str.getFechaAlta();
+                    maprajadores.put(password, trabs);
+
+                } else {
+                    if (mapresas.containsKey(str.getEmpresas().getCif())) {
+                        str.setEmpresas(mapresas.get(str.getEmpresas().getCif()));
+                    }
+                    if (mapegorias.containsKey(str.getCategorias().getNombreCategoria())) {
+                        str.setCategorias(mapegorias.get(str.getCategorias().getNombreCategoria()));
+                    }
+                    tr = sesion.beginTransaction();
+                    sesion.saveOrUpdate(str);
+                    tr.commit();
+                }
+            }
+
+            // ||------- NOMINAS -------||
+            System.out.println("Introduciendo Nominas en la base de datos");
+            for (Nomina n : nominaa) {
+                String consultaHQL = "FROM Nomina t WHERE (t.mes = :param1) "
+                        + "AND (t.anio = :param2) "
+                        + "AND (t.brutoNomina = :param3) "
+                        + "AND (t.liquidoNomina = :param4)";
+                Query query = sesion.createQuery(consultaHQL);
+                query.setParameter("param1", n.getMes());
+                query.setParameter("param2", n.getAnio());
+                query.setParameter("param3", n.getBrutoNomina());
+                query.setParameter("param4", n.getLiquidoNomina());
+
+                //lista de nominas que son iguales excepto trabajador
+                List<Nomina> noms = query.list();
+
+                //comprobar que el trabajador no estaba ya en la base de datos
+                password = n.getTrabajadorbbdd().getNombre() + "+"
+                        + n.getTrabajadorbbdd().getNifnie() + "+"
+                        + n.getTrabajadorbbdd().getFechaAlta();
+
+                if (maprajadores.containsKey(password)) {
+                    n.setTrabajadorbbdd(maprajadores.get(password));
+                }
+
+                if (noms.isEmpty()) {
+                    //no hay ninguna nomina igual, check Tra ya en base de datos
+                    tr = sesion.beginTransaction();
+                    sesion.saveOrUpdate(n);
+                    tr.commit();
+
+                } else {//coincide mes, ano, bruto y liquido, comprobar si trabajador tmb
+                    for (Nomina a : noms) {
+                        if (!n.getTrabajadorbbdd().equals(a.getTrabajadorbbdd())) {
+                            tr = sesion.beginTransaction();
+                            sesion.saveOrUpdate(n);
+                            tr.commit();
+
+                        }
+                    }
+                }
+            }
+            sesion.close();
+            HibernateUtil.shutdown();
+        } catch (Exception e) {
+            sesion.close();
+            HibernateUtil.shutdown();
+            System.err.println("No está el horno para bollos\n" + e.getMessage());
         }
     }
 
@@ -1183,4 +1299,5 @@ public class Sistemas2 {
             e.printStackTrace();
         }
     }
+
 }

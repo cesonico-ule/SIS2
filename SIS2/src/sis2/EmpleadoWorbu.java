@@ -65,52 +65,6 @@ public class EmpleadoWorbu {
         iban = datos[11];
         email = datos[12];
         fila = Integer.valueOf(datos[13]);
- 
-        
-        /*
-        Trabajadorbbdd empleado = new Trabajadorbbdd();
-        Empresas empresa = new Empresas();
-        Categorias categoria = new Categorias();
-        
-        empresa.setNombre(input.get(0));
-        empresa.setCif(input.get(1));
-        empleado.setEmpresas(empresa);
-        
-        categoria.setNombreCategoria(input.get(2));
-        empleado.setCategorias(categoria);
-        
-        empleado.setFechaAlta(input.get(3)); //problema Date-String
-        empleado.setApellido1(input.get(4));
-        empleado.setApellido2(input.get(5));
-        empleado.setNombre(input.get(6));
-        empleado.setNifnie(input.get(7));
-        
-        
-        empleado.setCodigoCuenta(input.get());
-        
-        empleado.setIban(input.get());
-        
-        /*
-            int fila, String nombreEmpresa, String cifEmpresa, String categoria, Date fechaAlta,  String apellido1, String apellido2, String nombre, String nif,
-            boolean prorrata, String codCuenta, String paisCuenta, String iban, String email){
-        
-        /*
-        trabajadorbbdd:
-        fechaAlta
-        apellido1
-        apellido2
-        nombre
-        nif
-        codCuenta
-        paisCuenta
-        iban
-        email
-                
-                empresa:
-                nombreEmpresa
-                cifEmpresa
-        */
-                        
     }
 
     public void setNombreEmpresa(String nombreEmpresa) {

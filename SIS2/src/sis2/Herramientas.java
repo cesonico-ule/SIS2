@@ -51,7 +51,7 @@ public class Herramientas {
         int resultSegun = bucleNum(segun);
         
         if(resultPrimer != checkPrimer || resultSegun != checkSegun){
-            System.out.println("El codigo de cuenta NO es correcto. Se procede a corregirlo.\n");
+//            System.out.println("El codigo de cuenta NO es correcto. Se procede a corregirlo.");
             //---Primeros 8 digitos---
             String nuevoCodigo = numCuenta.substring(0, 8);
             
@@ -65,7 +65,7 @@ public class Herramientas {
             
             return nuevoCodigo;
         } else {
-            System.out.println("El codigo de cuenta es correcto.\n");
+//            System.out.println("El codigo de cuenta es correcto.");
             return numCuenta;
         }
     }
@@ -84,12 +84,9 @@ public class Herramientas {
         double resto = calculateModulus97(IBANcalc);
         resto = 98-resto;
         
-        
-        
         double auxDou=Double.parseDouble(IBANcalc);
         
 	long auxInt1=(long) (auxDou%97);
-//        System.out.println(auxInt1);
 	auxInt1=98-auxInt1;
                 
         String checkNums;
@@ -105,8 +102,7 @@ public class Herramientas {
         
         return IBAN;
     }
-    
-    
+        
     // ||---------------------------- AUXILIAR --------------------------||
     
     //*Calcula el sumatorio de multiplicaciones que comprueba el numero de cuenta*
@@ -118,15 +114,7 @@ public class Herramientas {
         for(int i=0;i<10;i++){
             int a = aux.charAt(i) - '0';
             numero+= F[i] * a;
-            //System.out.println("\nbucle: "+(i+1));
-            //System.out.println("a =  "+ a);
-            //System.out.println("F =  "+ F[i]);
-            //System.out.println("Suma: "+ numero);
-
         }
-        
-        //System.out.println("Tras el sumatorio: "+ numero);
-        
         //---Operaciones finales---
         numero = numero%11;
         numero = 11-numero;
@@ -136,7 +124,6 @@ public class Herramientas {
         else if(numero == 11){numero = 0;}
         
         //---Resultado---
-        //System.out.println("Result: "+ numero);
         return numero;
     }
       
