@@ -1,5 +1,5 @@
 package Modelo;
-// Generated 18-mar-2021 18:35:15 by Hibernate Tools 4.3.1
+// Generated 30-may-2021 14:57:12 by Hibernate Tools 4.3.1
 
 
 
@@ -9,7 +9,7 @@ package Modelo;
 public class Nomina  implements java.io.Serializable {
 
 
-     private int idNomina;
+     private Integer idNomina;
      private Trabajadorbbdd trabajadorbbdd;
      private int mes;
      private int anio;
@@ -46,15 +46,13 @@ public class Nomina  implements java.io.Serializable {
     }
 
 	
-    public Nomina(int idNomina, Trabajadorbbdd trabajadorbbdd, int mes, int anio, int numeroTrienios) {
-        this.idNomina = idNomina;
+    public Nomina(Trabajadorbbdd trabajadorbbdd, int mes, int anio, int numeroTrienios) {
         this.trabajadorbbdd = trabajadorbbdd;
         this.mes = mes;
         this.anio = anio;
         this.numeroTrienios = numeroTrienios;
     }
-    public Nomina(int idNomina, Trabajadorbbdd trabajadorbbdd, int mes, int anio, int numeroTrienios, Double importeTrienios, Double importeSalarioMes, Double importeComplementoMes, Double valorProrrateo, Double brutoAnual, Double irpf, Double importeIrpf, Double baseEmpresario, Double seguridadSocialEmpresario, Double importeSeguridadSocialEmpresario, Double desempleoEmpresario, Double importeDesempleoEmpresario, Double formacionEmpresario, Double importeFormacionEmpresario, Double accidentesTrabajoEmpresario, Double importeAccidentesTrabajoEmpresario, Double fogasaempresario, Double importeFogasaempresario, Double seguridadSocialTrabajador, Double importeSeguridadSocialTrabajador, Double desempleoTrabajador, Double importeDesempleoTrabajador, Double formacionTrabajador, Double importeFormacionTrabajador, Double brutoNomina, Double liquidoNomina, Double costeTotalEmpresario) {
-       this.idNomina = idNomina;
+    public Nomina(Trabajadorbbdd trabajadorbbdd, int mes, int anio, int numeroTrienios, Double importeTrienios, Double importeSalarioMes, Double importeComplementoMes, Double valorProrrateo, Double brutoAnual, Double irpf, Double importeIrpf, Double baseEmpresario, Double seguridadSocialEmpresario, Double importeSeguridadSocialEmpresario, Double desempleoEmpresario, Double importeDesempleoEmpresario, Double formacionEmpresario, Double importeFormacionEmpresario, Double accidentesTrabajoEmpresario, Double importeAccidentesTrabajoEmpresario, Double fogasaempresario, Double importeFogasaempresario, Double seguridadSocialTrabajador, Double importeSeguridadSocialTrabajador, Double desempleoTrabajador, Double importeDesempleoTrabajador, Double formacionTrabajador, Double importeFormacionTrabajador, Double brutoNomina, Double liquidoNomina, Double costeTotalEmpresario) {
        this.trabajadorbbdd = trabajadorbbdd;
        this.mes = mes;
        this.anio = anio;
@@ -88,11 +86,11 @@ public class Nomina  implements java.io.Serializable {
        this.costeTotalEmpresario = costeTotalEmpresario;
     }
    
-    public int getIdNomina() {
+    public Integer getIdNomina() {
         return this.idNomina;
     }
     
-    public void setIdNomina(int idNomina) {
+    public void setIdNomina(Integer idNomina) {
         this.idNomina = idNomina;
     }
     public Trabajadorbbdd getTrabajadorbbdd() {
